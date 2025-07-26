@@ -1,4 +1,4 @@
-;SCP - Containment Breach
+;SCP - Containment Breach RTX Remaster
 
 ;    The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
 
@@ -208,7 +208,7 @@ Global GameSaved%
 
 Global CanSave% = True
 
-AppTitle "SCP - Containment Breach v"+VersionNumber
+AppTitle "SCP - Containment Breach RTX Remaster v"+VersionNumber
 
 PlayStartupVideos()
 
@@ -11691,7 +11691,7 @@ Function CatchErrors(location$)
 	If Len(errStr)>0 Then
 		If FileType(ErrorFile)=0 Then
 			errF = WriteFile(ErrorFile)
-			WriteLine errF,"An error occured in SCP - Containment Breach!"
+			WriteLine errF,"An error occured in SCP - Containment Breach RTX Remaster!"
 			WriteLine errF,"Version: "+VersionNumber
 			WriteLine errF,"Save compatible version: "+CompatibleNumber
 			WriteLine errF,"Date and time: "+CurrentDate()+" at "+CurrentTime()
