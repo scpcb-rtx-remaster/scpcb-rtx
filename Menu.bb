@@ -1114,6 +1114,10 @@ Function UpdateMainMenu()
 	AASetFont ConsoleFont
 	AAText 20,GraphicHeight-30,"v"+VersionNumber
 	
+	Color 126,186,11
+	AASetFont ConsoleFont
+	AAText 80,GraphicHeight-30,"(RTX)"
+
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
 	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
@@ -1162,9 +1166,8 @@ Function UpdateLauncher()
 	Next
 	
 	BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
-	CheckForUpdates()
 	
-	AppTitle "SCP - Containment Breach Launcher"
+	AppTitle "SCP - Containment Breach RTX Remaster (Launcher)"
 	
 	Repeat
 		
@@ -1266,12 +1269,6 @@ Function UpdateLauncher()
 			EndIf
 		EndIf
 		
-		UpdateCheckEnabled = DrawTick(LauncherWidth - 275, LauncherHeight - 50, UpdateCheckEnabled)
-		Color 255,255,255
-		Text LauncherWidth-250,LauncherHeight-70,"Check for"
-		Text LauncherWidth-250,LauncherHeight-50,"updates on"
-		Text LauncherWidth-250,LauncherHeight-30,"launch"
-		
 		If DrawButton(LauncherWidth - 30 - 90, LauncherHeight - 50 - 55, 100, 30, "LAUNCH", False, False, False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
 			GraphicHeight = GfxModeHeights(SelectedGFXMode)
@@ -1307,12 +1304,6 @@ Function UpdateLauncher()
 		PutINIValue(OptionFile, "options", "16bit", "false")
 	EndIf
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
-	If UpdateCheckEnabled Then
-		PutINIValue(OptionFile, "options", "check for updates", "true")
-	Else
-		PutINIValue(OptionFile, "options", "check for updates", "false")
-	EndIf
-	
 End Function
 
 
