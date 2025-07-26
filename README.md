@@ -1,12 +1,12 @@
-# SCP - Containment Breach
+# SCP - Containment Breach RTX Remaster
 
-The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
+>[!WARNING]
+>Beware - the source code is perhaps more horrifying than the game itself!
 
-This game and the source code are licensed under Creative Commons Attribution-ShareAlike 3.0 License.
+The game is based on the works of the [SCP Foundation community](http://www.scp-wiki.net/).
+This game and the source code are licensed under the [Creative Commons Attribution-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/).
 
-http://creativecommons.org/licenses/by-sa/3.0/
+### Requirements:
+*	[Blitz3D TTS v1.135-hotfix by ZiYueCommentary](https://github.com/ZiYueCommentary/Blitz3D)
 
-Requirements:
-•	Blitz3D v1.108
-
-Beware - the source code is perhaps more horrifying than the game itself!
+* [RTX Files for SCP - Containment Breach](https://github.com/scpcb-rtx-remaster/rtx-files); using a release is recommended
