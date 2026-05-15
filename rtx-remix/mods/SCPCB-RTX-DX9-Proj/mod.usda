@@ -7,11 +7,21 @@
         }
         string lightspeed_mod_name = "SCPCB-RTX-DX9-Proj"
         string lightspeed_mod_notes = "A RTX Remaster of SCP - Containment Breach on Dx9"
-        string lightspeed_mod_version = "0.19"
+        string lightspeed_mod_version = "0.20"
     }
     timeCodesPerSecond = 24
     upAxis = "Y"
 )
+
+over "OmniverseKit_Persp"
+{
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -18.74067309875176)
+}
+
+over "SphereLight"
+{
+    token visibility = "inherited"
+}
 
 over "RootNode"
 {
@@ -2105,6 +2115,69 @@ over "RootNode"
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
         }
+
+        over "mesh_7C028A0CD09C79B0"
+        {
+            def SphereLight "SphereLight" (
+                prepend apiSchemas = ["ShapingAPI"]
+            )
+            {
+                float3[] extent = [(-5, -5, -5), (5, 5, 5)]
+                color3f inputs:color = (0.9137255, 0.94509804, 0.95686275)
+                float inputs:intensity = 0.3
+                float inputs:radius = 55
+                float inputs:shaping:cone:angle = 180
+                float inputs:shaping:cone:softness
+                float inputs:shaping:focus
+                color3f inputs:shaping:focusTint
+                asset inputs:shaping:ies:file
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 646.2961493548052, -257.3526)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+
+            def SphereLight "SphereLight_01" (
+                prepend apiSchemas = ["ShapingAPI"]
+            )
+            {
+                float3[] extent = [(-5, -5, -5), (5, 5, 5)]
+                color3f inputs:color = (0.9137255, 0.94509804, 0.95686275)
+                float inputs:intensity = 0.3
+                float inputs:radius = 55
+                float inputs:shaping:cone:angle = 180
+                float inputs:shaping:cone:softness
+                float inputs:shaping:focus
+                color3f inputs:shaping:focusTint
+                asset inputs:shaping:ies:file
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 646.2961493548052, 257.3525952541313)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+        }
+
+        over "mesh_ED8D507E937113E3"
+        {
+            def SphereLight "SphereLight" (
+                prepend apiSchemas = ["ShapingAPI"]
+            )
+            {
+                float3[] extent = [(-5, -5, -5), (5, 5, 5)]
+                color3f inputs:color = (0.6666667, 0.8784314, 0.9843137)
+                float inputs:intensity = 500
+                float inputs:radius = 0.02
+                float inputs:shaping:cone:angle = 180
+                float inputs:shaping:cone:softness
+                float inputs:shaping:focus
+                color3f inputs:shaping:focusTint
+                asset inputs:shaping:ies:file
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (71.92152667063523, 1.494901600254197, 120.03078314091232)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+        }
     }
 
     over "instances"
@@ -2154,6 +2227,19 @@ over "RootNode"
                 custom bool inputs:enable_emission = 1
             }
         }
+
+        over "mat_9DAE513AEE8EF68C"
+        {
+            over "Shader"
+            {
+                custom bool inputs:blend_enabled = 1
+                custom int inputs:blend_type = 1
+                custom color3f inputs:emissive_color_constant = (0.76447874, 0.9649555, 1)
+                custom float inputs:emissive_intensity = 555
+                custom asset inputs:emissive_mask_texture = @./assets/ingested/tesla.e.rtex.dds@
+                custom bool inputs:enable_emission = 1
+            }
+        }
     }
 
     over "cameras"
@@ -2164,10 +2250,5 @@ over "RootNode"
             matrix4d xformOp:transform = ( (-0.11444127141568476, -0.17114410431461322, 0.9785769724223334, 0), (0.1436151740644526, 0.9718509297575932, 0.18676309086118206, 0), (-0.982994342392329, 0.1619119078015729, -0.08664096569671256, 0), (-112.62515642936918, -12.82809806034472, 74.62157753030174, 1) )
         }
     }
-}
-
-over "SphereLight"
-{
-    token visibility = "inherited"
 }
 
