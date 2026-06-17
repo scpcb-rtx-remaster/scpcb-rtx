@@ -680,7 +680,7 @@ Function LoadGame(file$)
 		
 		Local frame# = ReadFloat(f)
 		Select NPCtype
-			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk, NPCtype1048a
+			Case NPCtypeOldMan, NPCtypeD, NPCtypeD2, NPCtypeD3, NPCtypeS1, NPCtypeS2, NPCtypeB1, NPCtypeB2, NPCtypeV, NPCtypeC, NPCtypeG, NPCtypeJ, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk, NPCtype1048a
 				SetAnimTime(n\obj, frame)
 		End Select
 		
@@ -1528,7 +1528,7 @@ Function LoadGameQuick(file$)
 		
 		Local frame# = ReadFloat(f)
 		Select NPCtype
-			Case NPCtypeOldMan, NPCtypeD, NPCtypeD9341, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk, NPCtype1048a
+			Case NPCtypeOldMan, NPCtypeD, NPCtypeD2, NPCtypeD3, NPCtypeS1, NPCtypeS2, NPCtypeB1, NPCtypeB2, NPCtypeV, NPCtypeC, NPCtypeG, NPCtypeJ, NPCtypeD9341, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk, NPCtype1048a
 				SetAnimTime(n\obj, frame)
 		End Select		
 		

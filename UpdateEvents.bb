@@ -85,13 +85,15 @@ Function UpdateEvents()
 						If e\room\NPC[0] <> Null Then SetNPCFrame(e\room\NPC[0], 74) : e\room\NPC[0]\State = 8
 						
 						If e\room\NPC[1] = Null Then
-							e\room\NPC[1] = CreateNPC(NPCtypeD, 0,0,0)
-							ChangeNPCTextureID(e\room\NPC[1],3)
+							e\room\NPC[1] = CreateNPC(NPCtypeS2, 0,0,0)
+							;e\room\NPC[1]\CharacterOBJ = Scientist2Obj
+							;ChangeNPCTextureID(e\room\NPC[1],3)
 							;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-							e\room\NPC[1]\texture = "GFX\npcs\scientist2.jpg"
+							;e\room\NPC[1]\texture = "GFX\npcs\scientist2.jpg"
+							;e\room\NPC[1]\CharacterOBJ = Scientist2Obj
 							;EntityTexture e\room\NPC[1]\obj, tex
 							;FreeTexture tex
-							ChangeNPCTextureID(e\room\NPC[1],3)
+							;ChangeNPCTextureID(e\room\NPC[1],3)
 						Else
 							EntityType e\room\NPC[1]\Collider, HIT_DEAD
 						EndIf
@@ -953,11 +955,12 @@ Function UpdateEvents()
 								RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle+180, 0, True
 								e\room\NPC[5]\State = 7
 								e\room\NPC[5]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\PlayerEscape.ogg")
-								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
+								e\room\NPC[6] = CreateNPC(NPCtypeS2, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
+								;e\room\NPC[6]\obj = Scientist2Obj
 								;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
 								;EntityTexture e\room\NPC[6]\obj, DTextures[4]
 								;FreeTexture tex
-								ChangeNPCTextureID(e\room\NPC[6],3)
+								;ChangeNPCTextureID(e\room\NPC[6],3)
 								e\room\NPC[7] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
 								;tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
 								e\room\NPC[7]\Sound = LoadSound_Strict("SFX\Room\Intro\Scientist\Conversation.ogg")

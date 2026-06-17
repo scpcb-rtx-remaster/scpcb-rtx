@@ -5,7 +5,8 @@ Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtypePdPlane% = 17
 Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22
-;[End Block]
+Const NPCtypeD2% = 23, NPCtypeD3% = 24, NPCtypeS1% = 25, NPCtypeS2% = 26, NPCtypeJ% = 27
+Const NPCtypeV% = 28, NPCtypeG% = 29, NPCtypeC% = 30, NPCtypeB1% = 31, NPCtypeB2% = 32, NPCtypeNazi% = 33
 
 Const NPCBones$ = "Data\NPCBones.ini"
 
@@ -247,6 +248,96 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			n\CollRadius = 0.32
 			;[End Block]
+		Case NPCtypeD2
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(ClassD2Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(ClassD2Obj), -MeshHeight(ClassD2Obj), -MeshDepth(ClassD2Obj)*4, MeshWidth(ClassD2Obj)*2, MeshHeight(ClassD2Obj)*2, MeshDepth(ClassD2Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeD3
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(ClassD3Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(ClassD3Obj), -MeshHeight(ClassD3Obj), -MeshDepth(ClassD3Obj)*4, MeshWidth(ClassD3Obj)*2, MeshHeight(ClassD3Obj)*2, MeshDepth(CClassD3Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeJ
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(JanitorObj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(JanitorObj), -MeshHeight(JanitorObj), -MeshDepth(JanitorObj)*4, MeshWidth(JanitorObj)*2, MeshHeight(JanitorObj)*2, MeshDepth(JanitorObj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeS1
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(Scientist1Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(Scientist1Obj), -MeshHeight(Scientist1Obj), -MeshDepth(Scientist1Obj)*4, MeshWidth(Scientist1Obj)*2, MeshHeight(Scientist1Obj)*2, MeshDepth(Scientist1Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeS2
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(Scientist2Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(Scientist2Obj), -MeshHeight(Scientist2Obj), -MeshDepth(Scientist2Obj)*4, MeshWidth(Scientist2Obj)*2, MeshHeight(Scientist2Obj)*2, MeshDepth(Scientist2Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
 		Case NPCtypeD9341
 			;[Block]
 			n\NVName = I_Loc\NPC_Human
@@ -262,6 +353,114 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Speed = 2.0 / 100
 			
 			MeshCullBox (n\obj, -MeshWidth(ClassDObj), -MeshHeight(ClassDObj), -MeshDepth(ClassDObj)*4, MeshWidth(ClassDObj)*2, MeshHeight(ClassDObj)*2, MeshDepth(ClassDObj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeC
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(CorpseObj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(CorpseObj), -MeshHeight(CorpseObj), -MeshDepth(CorpseObj)*4, MeshWidth(CorpseObj)*2, MeshHeight(CorpseObj)*2, MeshDepth(CorpseObj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeV
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(Victim106Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(Victim106Obj), -MeshHeight(Victim106Obj), -MeshDepth(Victim106Obj)*4, MeshWidth(Victim106Obj)*2, MeshHeight(Victim106Obj)*2, MeshDepth(Victim106Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeB2
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(Body2Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(Body2Obj), -MeshHeight(Body2Obj), -MeshDepth(Body2Obj)*4, MeshWidth(Body2Obj)*2, MeshHeight(Body2Obj)*2, MeshDepth(Body2Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeB1
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(Body1Obj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(Body1Obj), -MeshHeight(Body1Obj), -MeshDepth(Body1Obj)*4, MeshWidth(Body1Obj)*2, MeshHeight(Body1Obj)*2, MeshDepth(Body1Obj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeG
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = CopyEntity(GonzalesObj)
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(GonzalesObj), -MeshHeight(GonzalesObj), -MeshDepth(GonzalesObj)*4, MeshWidth(GonzalesObj)*2, MeshHeight(GonzalesObj)*2, MeshDepth(GonzalesObj)*8)
+			
+			n\CollRadius = 0.32
+			;[End Block]
+		Case NPCtypeNazi
+			;[Block]
+			n\NVName = I_Loc\NPC_Human
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.32
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = LoadAnimMesh_Strict("GFX\npcs\naziofficer.b3d")
+			
+			temp# = 0.5 / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = 2.0 / 100
+			
+			MeshCullBox (n\obj, -MeshWidth(n\obj), -MeshHeight(n\obj), -MeshDepth(n\obj)*4, MeshWidth(n\obj)*2, MeshHeight(n\obj)*2, MeshDepth(n\obj)*8)
 			
 			n\CollRadius = 0.32
 			;[End Block]
@@ -2802,7 +3001,7 @@ If n = CurrD9341 Then
 	End Select
 		EndIf
 		;[End Block]
-		Case NPCtypeD,NPCtypeClerk 	;------------------------------------------------------------------------------------------------------------------
+		Case NPCtypeD,NPCtypeClerk,NPCtypeJ,NPCtypeD2,NPCtypeD3,NPCtypeS1,NPCtypeS2,NPCtypeG,NPCtypeB1,NPCtypeB2 	;------------------------------------------------------------------------------------------------------------------
 				;[Block]
 				RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
 				
@@ -2856,6 +3055,18 @@ If n = CurrD9341 Then
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 				
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider)-180.0, 0
+				;[End Block]
+			Case NPCtypeV
+				;[Block]
+				Update106VictimNPC(n)
+				;[End Block]
+			Case NPCtypeNazi
+				;[Block]
+				UpdateNaziOfficerNPC(n)
+				;[End Block]
+			Case NPCtypeC 
+				;[Block]
+				Update970CorpseNPC(n)
 				;[End Block]
 			Case NPCtype5131
 				;[Block]
@@ -7132,6 +7343,296 @@ Function Find860Angle(n.NPCs, fr.Forest)
 	EndIf		
 End Function
 
+Function ConsoleNPCPlayerVisible%(n.NPCs, maxDist#)
+	Local dist# = EntityDistance(n\Collider, Collider)
+	
+	If dist > maxDist Then Return False
+	If (Not EntityVisible(n\Collider, Collider)) Then Return False
+	
+	Return True
+End Function
+
+Function ConsoleNPCPlayerClearShot%(n.NPCs, maxDist#)
+	Local dist# = EntityDistance(n\Collider, Collider)
+	Local pvt%
+	Local clearShot%
+	
+	If dist > maxDist Then Return False
+	
+	pvt = CreatePivot()
+	PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider) + 0.8, EntityZ(n\Collider))
+	PointEntity(pvt, Collider)
+	EntityPick(pvt, dist)
+	clearShot = (PickedEntity() = Collider)
+	FreeEntity(pvt)
+	
+	Return clearShot
+End Function
+
+Function TurnConsoleNPCToPlayer(n.NPCs, smooth# = 20.0)
+	Local pvt% = CreatePivot()
+	
+	PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider))
+	PointEntity(pvt, Collider)
+	RotateEntity(n\Collider, 0, CurveAngle(EntityYaw(pvt), EntityYaw(n\Collider), smooth), 0, True)
+	FreeEntity(pvt)
+End Function
+
+Function UpdateNaziOfficerNPC(n.NPCs)
+	Local pvt%
+	Local visible%
+	
+	If n\State < 100 Then
+		If n\State = 0 Then AnimateNPC(n, 3, 26, 0.2, True)
+		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+		RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+		Return
+	EndIf
+	
+	TurnConsoleNPCToPlayer(n, 15.0)
+	visible = ConsoleNPCPlayerVisible(n, 12.0)
+	
+	Select n\State
+		Case 100
+			If n\State3 = 0 Then
+				SetNPCFrame(n, 3)
+				PlaySound2(LoadTempSound("SFX\SCP\1123\Officer1.ogg"), Camera, n\Collider, 8.0)
+				n\State3 = 1
+				n\State2 = 0
+			EndIf
+			
+			AnimateNPC(n, 3, 26, 0.2, True)
+			
+			If visible Then
+				n\State2 = n\State2 + FPSfactor
+			Else
+				n\State2 = Max(n\State2 - FPSfactor, 0.0)
+			EndIf
+			
+			If n\State2 > 360 Then
+				If visible Then
+					PlaySound2(LoadTempSound("SFX\SCP\1123\Officer2.ogg"), Camera, n\Collider, 8.0)
+					n\State = 101
+					n\State2 = 0
+				EndIf
+			EndIf
+		Case 101
+			AnimateNPC(n, 3, 26, 0.2, True)
+			
+			If visible Then
+				n\State2 = n\State2 + FPSfactor
+			Else
+				n\State2 = Max(n\State2 - FPSfactor, 0.0)
+			EndIf
+			
+			If n\State2 > 280 Then
+				If visible Then
+					SetNPCFrame(n, 75)
+					If n\Sound = 0 Then n\Sound = LoadSound_Strict("SFX\SCP\1123\Officer3.ogg")
+					n\SoundChn = 0
+					n\State = 102
+					n\State2 = 0
+				EndIf
+			EndIf
+		Case 102
+			AnimateNPC(n, 75, 128, 0.04, True)
+			
+			If n\Sound = 0 Then n\Sound = LoadSound_Strict("SFX\SCP\1123\Officer3.ogg")
+			
+			If n\SoundChn <> 0 Then
+				If (Not ChannelPlaying(n\SoundChn)) Then
+					If ConsoleNPCPlayerClearShot(n, 12.0) Then
+						PlaySound2(LoadTempSound("SFX\SCP\1123\Gunshot.ogg"), Camera, n\Collider, 35.0)
+						pvt = CreatePivot()
+						PositionEntity(pvt, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
+						RotateEntity(pvt, EntityPitch(n\Collider), EntityYaw(n\Collider), 0, True)
+						MoveEntity(pvt, 0.8 * 0.079, 10.75 * 0.079, 6.9 * 0.079)
+						Shoot(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 1.0, False, True)
+						FreeEntity(pvt)
+						n\State = 103
+						If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+					Else
+						n\SoundChn = 0
+					EndIf
+				EndIf
+			EndIf
+			
+			If n\State = 102 Then n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0)
+		Case 103
+			AnimateNPC(n, 128, 128, 0.0, False)
+	End Select
+	
+	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+	RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+End Function
+
+Function Update970CorpseNPC(n.NPCs)
+	Local dist#
+	Local y#
+	Local pick%
+	
+	If n\State < 100 Then
+		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+		RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+		Return
+	EndIf
+	
+	n\IsDead = True
+	dist = EntityDistance(Collider, n\Collider)
+	
+	Select n\State
+		Case 100
+			If n\State3 = 0 Then
+				EntityType n\Collider, 0
+				pick = LinePick(EntityX(n\Collider), EntityY(n\Collider) + 0.5, EntityZ(n\Collider), 0, -5.0, 0)
+				If pick <> 0 Then PositionEntity n\Collider, EntityX(n\Collider), PickedY() + 0.35, EntityZ(n\Collider)
+				SetNPCFrame(n, 80)
+				n\EnemyY = EntityY(n\Collider)
+				n\State2 = 0
+				n\State3 = 1
+			EndIf
+			
+			SetNPCFrame(n, 80)
+			
+			If dist < 3.0 Then
+				If EntityInView(n\obj, Camera) Then
+					CurrCameraZoom = (Sin(Float(MilliSecs()) / 20.0) + 1.0) * 15.0
+					HeartBeatVolume = Max(CurveValue(0.3, HeartBeatVolume, 2.0), HeartBeatVolume)
+					HeartBeatRate = Max(HeartBeatRate, 120)
+				EndIf
+			EndIf
+			
+			If dist < 8.0 Then n\State2 = n\State2 + FPSfactor
+			If n\State2 > 420 Then
+				n\State = 101
+				n\GravityMult = 0.0
+				n\DropSpeed = 0.0
+			EndIf
+		Case 101
+			n\GravityMult = 0.0
+			n\DropSpeed = 0.0
+			
+			If n\Sound = 0 Then n\Sound = LoadSound_Strict("SFX\SCP\970\Corpse.ogg")
+			n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0)
+			
+			AnimateNPC(n, 80, 61, -0.02, False)
+			y = CurveValue(n\EnemyY + 1.5 + Sin(Float(MilliSecs()) / 20.0) * 0.1, EntityY(n\Collider), 50.0)
+			PositionEntity n\Collider, EntityX(n\Collider), y, EntityZ(n\Collider)
+			TurnEntity n\Collider, 0, 0.1 * FPSfactor, 0
+			
+			If dist < 3.0 Then
+				CurrCameraZoom = (Sin(Float(MilliSecs()) / 20.0) + 1.0) * 15.0
+				HeartBeatVolume = Max(CurveValue(0.3, HeartBeatVolume, 2.0), HeartBeatVolume)
+				HeartBeatRate = Max(HeartBeatRate, 120)
+			EndIf
+	End Select
+	
+	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+	RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+End Function
+
+Function Update106VictimNPC(n.NPCs)
+	Local de.Decals
+	Local pick%
+	Local ceilingY#
+	Local floorY#
+	Local dist#
+	Local fdir#
+	
+	If n\State < 100 Then
+		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+		RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+		Return
+	EndIf
+	
+	Select n\State
+		Case 100
+			If n\State3 = 0 Then
+				EntityType n\Collider, 0
+				ceilingY = EntityY(n\Collider) + 2.5
+				pick = LinePick(EntityX(n\Collider), EntityY(n\Collider) + 0.1, EntityZ(n\Collider), 0, 8.0, 0)
+				If pick <> 0 Then ceilingY = PickedY() - 0.001
+				
+				floorY = EntityY(n\Collider)
+				pick = LinePick(EntityX(n\Collider), ceilingY - 0.1, EntityZ(n\Collider), 0, -10.0, 0)
+				If pick <> 0 Then floorY = PickedY() + 0.35
+				
+				de.Decals = CreateDecal(0, EntityX(n\Collider), ceilingY, EntityZ(n\Collider), -90, Rand(360), 0)
+				If de <> Null Then
+					de\Size = 0.05
+					de\SizeChange = 0.0015
+					EntityAlpha(de\obj, 0.8)
+					UpdateDecals()
+					PlaySound2(DecaySFX(3), Camera, de\obj, 15.0)
+				EndIf
+				
+				PositionEntity n\Collider, EntityX(n\Collider), ceilingY + 0.5, EntityZ(n\Collider)
+				RotateEntity n\Collider, 0, Rnd(360), 0, True
+				SetNPCFrame(n, 1)
+				n\EnemyY = floorY
+				n\FallingPickDistance = 0.0
+				n\GravityMult = 0.0
+				n\DropSpeed = 0.0
+				n\State2 = 0
+				n\State3 = 1
+				EntityType n\Collider, 0
+			EndIf
+			
+			n\State2 = n\State2 + FPSfactor
+			If n\State2 > 200 Then
+				n\State = 101
+				n\State2 = 0
+				n\GravityMult = 1.0
+				EntityType n\Collider, HIT_PLAYER
+				PlaySound_Strict HorrorSFX(0)
+				PlaySound2(DecaySFX(2), Camera, n\Collider, 15.0)
+			EndIf
+		Case 101
+			n\FallingPickDistance = 0.0
+			n\GravityMult = 1.0
+			
+			If EntityY(n\Collider) > n\EnemyY Then
+				AnimateNPC(n, 1, 10, 0.12, False)
+				dist = EntityDistance(Collider, n\Collider)
+				If dist < 0.8 Then
+					fdir = point_direction(EntityX(Collider, True), EntityZ(Collider, True), EntityX(n\Collider, True), EntityZ(n\Collider, True))
+					TranslateEntity Collider, Cos(-fdir + 90) * (dist - 0.8) * (dist - 0.8), 0, Sin(-fdir + 90) * (dist - 0.8) * (dist - 0.8)
+				EndIf
+				
+				If EntityY(n\Collider) > n\EnemyY + 0.25 Then EntityType n\Collider, 0
+			Else
+				PositionEntity n\Collider, EntityX(n\Collider), n\EnemyY, EntityZ(n\Collider)
+				n\DropSpeed = 0.0
+				n\GravityMult = 0.0
+				EntityType n\Collider, HIT_PLAYER
+				AnimateNPC(n, 11, 19, 0.25, False)
+				
+				If n\Sound = 0 Then
+					n\Sound = LoadSound_Strict("SFX\General\BodyFall.ogg")
+					PlaySound_Strict n\Sound
+					floorY = n\EnemyY - 0.35 + 0.001
+					de.Decals = CreateDecal(0, EntityX(n\Collider), floorY, EntityZ(n\Collider), 90, Rand(360), 0)
+					If de <> Null Then
+						de\Size = 0.4
+						EntityAlpha(de\obj, 0.8)
+						UpdateDecals()
+					EndIf
+				EndIf
+				
+				n\State = 102
+				n\State2 = 0
+			EndIf
+		Case 102
+			n\DropSpeed = 0.0
+			n\GravityMult = 0.0
+			PositionEntity n\Collider, EntityX(n\Collider), n\EnemyY, EntityZ(n\Collider)
+			AnimateNPC(n, 11, 19, 0.25, False)
+	End Select
+	
+	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+	RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+End Function
+
 Function Console_SpawnNPC(c_input$, c_state$ = "")
 	Local n.NPCs
 	Local consoleMSG$
@@ -7197,10 +7698,65 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "1499-1", "14991", "scp-1499-1", "scp1499-1"
 			n.NPCs = CreateNPC(NPCtype1499, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-1499-1 instance spawned."
-			
+			;NPCtypeD2, NPCtypeD3, NPCtypeS1, NPCtypeS2, NPCtypeB1, NPCtypeB2, NPCtypeV, NPCtypeC, NPCtypeG, NPCtypeJ,
 		Case "class-d", "classd", "d"
 			n.NPCs = CreateNPC(NPCtypeD, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "D-Class spawned."
+
+		Case "class-d2", "classd2", "d2"
+			n.NPCs = CreateNPC(NPCtypeD2, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "D-Class 2 spawned."
+		
+		Case "class-d3", "classd3", "d3"
+			n.NPCs = CreateNPC(NPCtypeD3, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "D-Class spawned."
+
+		Case "scientist", "scientist2", "franklin", "Security Chief Franklin", "Chief Franklin", "Franklin Carey"
+			n.NPCs = CreateNPC(NPCtypeS2, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Security Chief Franklin spawned."
+
+		Case "scientist", "scientist1"
+			n.NPCs = CreateNPC(NPCtypeS1, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Scientist 1 spawned."
+		
+		Case "106victim", "Victim 106", "106 victim"
+			n.NPCs = CreateNPC(NPCtypeV, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 100
+			n\State2 = 0
+			n\State3 = 0
+			consoleMSG = "SCP-106 Victim spawned."
+
+		Case "corpse", "970 corpse", "corpse in 970", "body in 970", "corpse in 970"
+			n.NPCs = CreateNPC(NPCtypeC, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 100
+			n\State2 = 0
+			n\State3 = 0
+			SetNPCFrame(n, 80)
+			consoleMSG = "Corpse spawned."
+
+		Case "dead class-d", "dead classd", "body", "body1"
+			n.NPCs = CreateNPC(NPCtypeB1, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Dead D-Class spawned."
+
+		Case "dead scientist", "body2", "nuke body", "warhead room corpse"
+			n.NPCs = CreateNPC(NPCtypeB2, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Dead Scientist spawned."
+
+		Case "janitor", "janitorial", "endroom janitor"
+			n.NPCs = CreateNPC(NPCtypeJ, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Janitor spawned."
+		
+		Case "gonzales", "jim gonzales", "gonzales jim"
+			n.NPCs = CreateNPC(NPCtypeG, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Gonzales Jim spawned."
+		
+		Case "nazi", "german", "naziofficer", "nazi officer", "ss officer", "ss"
+			n.NPCs = CreateNPC(NPCtypeNazi, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 100
+			n\State2 = 0
+			n\State3 = 0
+			consoleMSG = "Nazi Officer spawned."
+
 		Case "d9341", "d-9341", "benjamin walker", "benjamin oliver walker", "benjamin"
 			n.NPCs = CreateNPC(NPCtypeD9341, EntityX(Collider), EntityY(Collider), EntityZ(Collider) + 0.2)
 			consoleMSG = "Subject D-9341 spawned."

@@ -3454,7 +3454,9 @@ Dim DecalTextures%(20)
 Global Monitor%, MonitorTexture%
 Global CamBaseOBJ%, CamOBJ%
 
-Global LiquidObj%,nvmeshash%,nvmeshashred%,nvmeshashblue%,MTFObj%,GuardObj%,ClassDObj%,D9341Obj%
+Global LiquidObj%,nvmeshash%,nvmeshashred%,nvmeshashblue%,MTFObj%,GuardObj%
+Global ClassDObj%,ClassD2Obj%,ClassD3Obj%,JanitorObj%,Scientist1Obj%,Scientist2Obj%,D9341Obj%
+Global CorpseObj%,Victim106Obj%,Body1Obj%,Body2Obj%,GonzalesObj%
 Global ApacheObj%,ApacheRotorObj%
 
 Global UnableToMove% = False
@@ -8936,9 +8938,20 @@ Function LoadEntities()
 	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
 	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the guards even more
 	
-	ClassDObj = LoadAnimMesh_Strict("GFX\npcs\classd.b3d") ;optimized Class-D's and scientists/researchers
+	ClassDObj = LoadAnimMesh_Strict("GFX\npcs\classd1.b3d") ;optimized Class-D's and scientists/researchers
+	ClassD2Obj = LoadAnimMesh_Strict("GFX\npcs\classd2.b3d")
+	ClassD3Obj = LoadAnimMesh_Strict("GFX\npcs\classd3.b3d")
+	JanitorObj = LoadAnimMesh_Strict("GFX\npcs\janitor.b3d")
+	Scientist1Obj = LoadAnimMesh_Strict("GFX\npcs\scientist1.b3d")
+	Scientist2Obj = LoadAnimMesh_Strict("GFX\npcs\scientist2.b3d")
 
 	D9341Obj = LoadAnimMesh_Strict("GFX\npcs\d9341.b3d") ;The playermodel for Subject D-9341
+
+	CorpseObj = LoadAnimMesh_Strict("GFX\npcs\corpse.b3d")
+	Victim106Obj = LoadAnimMesh_Strict("GFX\npcs\106victim.b3d")
+	Body1Obj = LoadAnimMesh_Strict("GFX\npcs\body1.b3d")
+	Body2Obj = LoadAnimMesh_Strict("GFX\npcs\body2.b3d")
+	GonzalesObj = LoadAnimMesh_Strict("GFX\npcs\gonzales.b3d")
 
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
 	ApacheRotorObj = LoadAnimMesh_Strict("GFX\apacherotor.b3d") ;optimized the Apaches even more
@@ -8946,7 +8959,17 @@ Function LoadEntities()
 	HideEntity MTFObj
 	HideEntity GuardObj
 	HideEntity ClassDObj
+	HideEntity ClassD2Obj
+	HideEntity ClassD3Obj
+    HideEntity JanitorObj
+	HideEntity Scientist1Obj
+	HideEntity Scientist2Obj
 	HideEntity D9341Obj
+	HideEntity CorpseObj
+	HideEntity Victim106Obj
+	HideEntity Body1Obj
+	HideEntity Body2Obj
+	HideEntity GonzalesObj
 	HideEntity ApacheObj
 	HideEntity ApacheRotorObj
 	
