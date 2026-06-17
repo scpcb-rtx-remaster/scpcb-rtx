@@ -373,6 +373,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(CorpseObj), -MeshHeight(CorpseObj), -MeshDepth(CorpseObj)*4, MeshWidth(CorpseObj)*2, MeshHeight(CorpseObj)*2, MeshDepth(CorpseObj)*8)
 			
 			n\CollRadius = 0.32
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 80)
 			;[End Block]
 		Case NPCtypeV
 			;[Block]
@@ -391,6 +394,9 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(Victim106Obj), -MeshHeight(Victim106Obj), -MeshDepth(Victim106Obj)*4, MeshWidth(Victim106Obj)*2, MeshHeight(Victim106Obj)*2, MeshDepth(Victim106Obj)*8)
 			
 			n\CollRadius = 0.32
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 1)
 			;[End Block]
 		Case NPCtypeB2
 			;[Block]
@@ -409,6 +415,10 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(Body2Obj), -MeshHeight(Body2Obj), -MeshDepth(Body2Obj)*4, MeshWidth(Body2Obj)*2, MeshHeight(Body2Obj)*2, MeshDepth(Body2Obj)*8)
 			
 			n\CollRadius = 0.32
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 40)
 			;[End Block]
 		Case NPCtypeB1
 			;[Block]
@@ -427,6 +437,10 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(Body1Obj), -MeshHeight(Body1Obj), -MeshDepth(Body1Obj)*4, MeshWidth(Body1Obj)*2, MeshHeight(Body1Obj)*2, MeshDepth(Body1Obj)*8)
 			
 			n\CollRadius = 0.32
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 80)
 			;[End Block]
 		Case NPCtypeG
 			;[Block]
@@ -445,6 +459,10 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(GonzalesObj), -MeshHeight(GonzalesObj), -MeshDepth(GonzalesObj)*4, MeshWidth(GonzalesObj)*2, MeshHeight(GonzalesObj)*2, MeshDepth(GonzalesObj)*8)
 			
 			n\CollRadius = 0.32
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 80)
 			;[End Block]
 		Case NPCtypeNazi
 			;[Block]
@@ -7359,10 +7377,12 @@ Function ConsoleNPCPlayerClearShot%(n.NPCs, maxDist#)
 	
 	If dist > maxDist Then Return False
 	
+	If EntityVisible(n\Collider, Collider) Then Return True
+	
 	pvt = CreatePivot()
 	PositionEntity(pvt, EntityX(n\Collider), EntityY(n\Collider) + 0.8, EntityZ(n\Collider))
 	PointEntity(pvt, Collider)
-	EntityPick(pvt, dist)
+	EntityPick(pvt, dist + 0.25)
 	clearShot = (PickedEntity() = Collider)
 	FreeEntity(pvt)
 	
@@ -7378,12 +7398,68 @@ Function TurnConsoleNPCToPlayer(n.NPCs, smooth# = 20.0)
 	FreeEntity(pvt)
 End Function
 
+Function ConsoleNPCMapPickY#(x#, startY#, z#, yDelta#, fallback#)
+	Local pick%
+	Local i%
+	Local curY#
+	Local endY#
+	Local remaining#
+	
+	curY = startY
+	endY = startY + yDelta
+	remaining = yDelta
+	
+	For i = 0 To 8
+		If Abs(remaining) < 0.05 Then Exit
+		pick = LinePick(x, curY, z, 0, remaining, 0)
+		If pick <> 0 Then
+			If GetEntityType(pick) = HIT_MAP Then Return PickedY()
+			If yDelta < 0 Then
+				curY = PickedY() - 0.25
+			Else
+				curY = PickedY() + 0.25
+			EndIf
+			remaining = endY - curY
+		Else
+			Exit
+		EndIf
+	Next
+	
+	Return fallback
+End Function
+
+Function ConsoleNPCFindFloorY#(x#, startY#, z#, fallback#)
+	Return ConsoleNPCMapPickY(x, startY, z, -30.0, fallback)
+End Function
+
+Function ConsoleNPCFindCeilingY#(x#, startY#, z#, fallback#)
+	Return ConsoleNPCMapPickY(x, startY, z, 12.0, fallback)
+End Function
+
 Function UpdateNaziOfficerNPC(n.NPCs)
 	Local pvt%
 	Local visible%
+	Local dist#
 	
 	If n\State < 100 Then
 		If n\State = 0 Then AnimateNPC(n, 3, 26, 0.2, True)
+		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+		RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+		Return
+	EndIf
+	
+	dist = EntityDistance(n\Collider, Collider)
+	
+	; If the player backs far enough away, return the officer to the initial idle state.
+	; State3 is cleared so Officer1.ogg is only replayed once the player comes close again.
+	If dist > 16.0 Then
+		If n\SoundChn <> 0 Then StopChannel n\SoundChn : n\SoundChn = 0
+		If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
+		n\State = 100
+		n\State2 = 0
+		n\State3 = 0
+		SetNPCFrame(n, 3)
+		AnimateNPC(n, 3, 26, 0.2, True)
 		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 		RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
 		Return
@@ -7394,19 +7470,21 @@ Function UpdateNaziOfficerNPC(n.NPCs)
 	
 	Select n\State
 		Case 100
-			If n\State3 = 0 Then
-				SetNPCFrame(n, 3)
-				PlaySound2(LoadTempSound("SFX\SCP\1123\Officer1.ogg"), Camera, n\Collider, 8.0)
-				n\State3 = 1
-				n\State2 = 0
-			EndIf
-			
 			AnimateNPC(n, 3, 26, 0.2, True)
 			
-			If visible Then
-				n\State2 = n\State2 + FPSfactor
+			If n\State3 = 0 Then
+				If visible Then
+					SetNPCFrame(n, 3)
+					PlaySound2(LoadTempSound("SFX\SCP\1123\Officer1.ogg"), Camera, n\Collider, 8.0)
+					n\State3 = 1
+					n\State2 = 0
+				EndIf
 			Else
-				n\State2 = Max(n\State2 - FPSfactor, 0.0)
+				If visible Then
+					n\State2 = n\State2 + FPSfactor
+				Else
+					n\State2 = Max(n\State2 - FPSfactor, 0.0)
+				EndIf
 			EndIf
 			
 			If n\State2 > 360 Then
@@ -7452,12 +7530,22 @@ Function UpdateNaziOfficerNPC(n.NPCs)
 						n\State = 103
 						If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
 					Else
+						; Lost the clean shot after the gun-load line, so reset and wait for the player again.
 						n\SoundChn = 0
+						n\State = 100
+						n\State2 = 0
+						n\State3 = 0
 					EndIf
 				EndIf
 			EndIf
 			
-			If n\State = 102 Then n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0)
+			If n\State = 102 Then
+				If n\SoundChn = 0 Then
+					n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider, 15.0)
+				Else
+					n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 15.0)
+				EndIf
+			EndIf
 		Case 103
 			AnimateNPC(n, 128, 128, 0.0, False)
 	End Select
@@ -7469,7 +7557,9 @@ End Function
 Function Update970CorpseNPC(n.NPCs)
 	Local dist#
 	Local y#
-	Local pick%
+	Local floorY#
+	Local ceilingY#
+	Local targetY#
 	
 	If n\State < 100 Then
 		PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
@@ -7483,11 +7573,19 @@ Function Update970CorpseNPC(n.NPCs)
 	Select n\State
 		Case 100
 			If n\State3 = 0 Then
-				EntityType n\Collider, 0
-				pick = LinePick(EntityX(n\Collider), EntityY(n\Collider) + 0.5, EntityZ(n\Collider), 0, -5.0, 0)
-				If pick <> 0 Then PositionEntity n\Collider, EntityX(n\Collider), PickedY() + 0.35, EntityZ(n\Collider)
+				; This prevents low-ceiling rooms from being mistaken for the floor.
+				ceilingY = ConsoleNPCFindCeilingY(EntityX(n\Collider), EntityY(n\Collider) + 0.05, EntityZ(n\Collider), EntityY(n\Collider) + 2.5)
+				floorY = ConsoleNPCFindFloorY(EntityX(n\Collider), Min(EntityY(n\Collider) + 0.05, ceilingY - 0.05), EntityZ(n\Collider), EntityY(n\Collider) - 0.35)
+				PositionEntity n\Collider, EntityX(n\Collider), floorY + 0.32, EntityZ(n\Collider)
+				ResetEntity n\Collider
 				SetNPCFrame(n, 80)
-				n\EnemyY = EntityY(n\Collider)
+				n\IsDead = True
+				EntityType n\Collider, HIT_DEAD
+				n\EnemyY = floorY + 0.32
+				n\EnemyX = ceilingY
+				n\GravityMult = 0.0
+				n\DropSpeed = 0.0
+				n\FallingPickDistance = 0.0
 				n\State2 = 0
 				n\State3 = 1
 			EndIf
@@ -7511,12 +7609,19 @@ Function Update970CorpseNPC(n.NPCs)
 		Case 101
 			n\GravityMult = 0.0
 			n\DropSpeed = 0.0
+			n\FallingPickDistance = 0.0
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
 			
 			If n\Sound = 0 Then n\Sound = LoadSound_Strict("SFX\SCP\970\Corpse.ogg")
 			n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 8.0)
 			
 			AnimateNPC(n, 80, 61, -0.02, False)
-			y = CurveValue(n\EnemyY + 1.5 + Sin(Float(MilliSecs()) / 20.0) * 0.1, EntityY(n\Collider), 50.0)
+			
+			targetY = n\EnemyY + 0.85
+			If n\EnemyX > n\EnemyY Then targetY = Min(targetY, n\EnemyX - 0.75)
+			targetY = Max(targetY, n\EnemyY + 0.35)
+			y = CurveValue(targetY + Sin(Float(MilliSecs()) / 20.0) * 0.1, EntityY(n\Collider), 50.0)
 			PositionEntity n\Collider, EntityX(n\Collider), y, EntityZ(n\Collider)
 			TurnEntity n\Collider, 0, 0.1 * FPSfactor, 0
 			
@@ -7533,7 +7638,6 @@ End Function
 
 Function Update106VictimNPC(n.NPCs)
 	Local de.Decals
-	Local pick%
 	Local ceilingY#
 	Local floorY#
 	Local dist#
@@ -7548,16 +7652,19 @@ Function Update106VictimNPC(n.NPCs)
 	Select n\State
 		Case 100
 			If n\State3 = 0 Then
+				; While the decal appears, mimic the room event by keeping the victim out of sight.
+				n\IsDead = False
 				EntityType n\Collider, 0
-				ceilingY = EntityY(n\Collider) + 2.5
-				pick = LinePick(EntityX(n\Collider), EntityY(n\Collider) + 0.1, EntityZ(n\Collider), 0, 8.0, 0)
-				If pick <> 0 Then ceilingY = PickedY() - 0.001
+				HideEntity n\obj
 				
-				floorY = EntityY(n\Collider)
-				pick = LinePick(EntityX(n\Collider), ceilingY - 0.1, EntityZ(n\Collider), 0, -10.0, 0)
-				If pick <> 0 Then floorY = PickedY() + 0.35
+				; Find the ceiling above the spawn point, then find the actual floor below that ceiling.
+				; The helper skips non-map hits instead of disabling the player collider, so spawning no longer nudges the player.
+				ceilingY = ConsoleNPCFindCeilingY(EntityX(n\Collider), EntityY(n\Collider) + 0.05, EntityZ(n\Collider), EntityY(n\Collider) + 2.5)
+				floorY = ConsoleNPCFindFloorY(EntityX(n\Collider), ceilingY - 0.05, EntityZ(n\Collider), EntityY(n\Collider) - 1.5)
+				If floorY > ceilingY - 0.5 Then floorY = ConsoleNPCFindFloorY(EntityX(n\Collider), EntityY(n\Collider) + 0.05, EntityZ(n\Collider), EntityY(n\Collider) - 1.5)
 				
-				de.Decals = CreateDecal(0, EntityX(n\Collider), ceilingY, EntityZ(n\Collider), -90, Rand(360), 0)
+				; Move the ceiling decal down a hair to prevent z-fighting/flicker against the ceiling surface.
+				de.Decals = CreateDecal(0, EntityX(n\Collider), ceilingY - 0.005, EntityZ(n\Collider), -90, Rand(360), 0)
 				If de <> Null Then
 					de\Size = 0.05
 					de\SizeChange = 0.0015
@@ -7566,51 +7673,58 @@ Function Update106VictimNPC(n.NPCs)
 					PlaySound2(DecaySFX(3), Camera, de\obj, 15.0)
 				EndIf
 				
-				PositionEntity n\Collider, EntityX(n\Collider), ceilingY + 0.5, EntityZ(n\Collider)
+				PositionEntity n\Collider, EntityX(n\Collider), ceilingY + 0.85, EntityZ(n\Collider)
+				ResetEntity n\Collider
 				RotateEntity n\Collider, 0, Rnd(360), 0, True
 				SetNPCFrame(n, 1)
-				n\EnemyY = floorY
+				n\EnemyY = floorY + 0.32
+				n\EnemyX = ceilingY
 				n\FallingPickDistance = 0.0
 				n\GravityMult = 0.0
 				n\DropSpeed = 0.0
 				n\State2 = 0
 				n\State3 = 1
-				EntityType n\Collider, 0
 			EndIf
+			
+			n\IsDead = False
+			EntityType n\Collider, 0
+			HideEntity n\obj
 			
 			n\State2 = n\State2 + FPSfactor
 			If n\State2 > 200 Then
 				n\State = 101
 				n\State2 = 0
 				n\GravityMult = 1.0
-				EntityType n\Collider, HIT_PLAYER
+				n\FallingPickDistance = 0.0
+				n\DropSpeed = 0.0
+				n\IsDead = False
+				EntityType n\Collider, 0
+				PositionEntity n\Collider, EntityX(n\Collider), n\EnemyX + 0.85, EntityZ(n\Collider)
+				ResetEntity n\Collider
+				ShowEntity n\obj
 				PlaySound_Strict HorrorSFX(0)
 				PlaySound2(DecaySFX(2), Camera, n\Collider, 15.0)
 			EndIf
 		Case 101
 			n\FallingPickDistance = 0.0
 			n\GravityMult = 1.0
+			n\IsDead = False
+			EntityType n\Collider, 0
+			ShowEntity n\obj
 			
-			If EntityY(n\Collider) > n\EnemyY Then
+			If EntityY(n\Collider) > n\EnemyY + 0.05 Then
 				AnimateNPC(n, 1, 10, 0.12, False)
-				dist = EntityDistance(Collider, n\Collider)
-				If dist < 0.8 Then
-					fdir = point_direction(EntityX(Collider, True), EntityZ(Collider, True), EntityX(n\Collider, True), EntityZ(n\Collider, True))
-					TranslateEntity Collider, Cos(-fdir + 90) * (dist - 0.8) * (dist - 0.8), 0, Sin(-fdir + 90) * (dist - 0.8) * (dist - 0.8)
-				EndIf
-				
-				If EntityY(n\Collider) > n\EnemyY + 0.25 Then EntityType n\Collider, 0
 			Else
 				PositionEntity n\Collider, EntityX(n\Collider), n\EnemyY, EntityZ(n\Collider)
 				n\DropSpeed = 0.0
 				n\GravityMult = 0.0
-				EntityType n\Collider, HIT_PLAYER
+				EntityType n\Collider, HIT_DEAD
 				AnimateNPC(n, 11, 19, 0.25, False)
 				
 				If n\Sound = 0 Then
 					n\Sound = LoadSound_Strict("SFX\General\BodyFall.ogg")
 					PlaySound_Strict n\Sound
-					floorY = n\EnemyY - 0.35 + 0.001
+					floorY = n\EnemyY - 0.32 + 0.001
 					de.Decals = CreateDecal(0, EntityX(n\Collider), floorY, EntityZ(n\Collider), 90, Rand(360), 0)
 					If de <> Null Then
 						de\Size = 0.4
@@ -7625,6 +7739,9 @@ Function Update106VictimNPC(n.NPCs)
 		Case 102
 			n\DropSpeed = 0.0
 			n\GravityMult = 0.0
+			n\FallingPickDistance = 0.0
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
 			PositionEntity n\Collider, EntityX(n\Collider), n\EnemyY, EntityZ(n\Collider)
 			AnimateNPC(n, 11, 19, 0.25, False)
 	End Select
@@ -7736,10 +7853,18 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 
 		Case "dead class-d", "dead classd", "body", "body1"
 			n.NPCs = CreateNPC(NPCtypeB1, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 80)
 			consoleMSG = "Dead D-Class spawned."
 
-		Case "dead scientist", "body2", "nuke body", "warhead room corpse"
+		Case "dead scientist", "deadscientist", "body2", "nuke body", "nuke", "nukebody", "nuke corpse", "nukecorpse", "warhead room corpse"
 			n.NPCs = CreateNPC(NPCtypeB2, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 40)
 			consoleMSG = "Dead Scientist spawned."
 
 		Case "janitor", "janitorial", "endroom janitor"
@@ -7748,6 +7873,10 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		
 		Case "gonzales", "jim gonzales", "gonzales jim"
 			n.NPCs = CreateNPC(NPCtypeG, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 3
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			SetNPCFrame(n, 80)
 			consoleMSG = "Gonzales Jim spawned."
 		
 		Case "nazi", "german", "naziofficer", "nazi officer", "ss officer", "ss"
