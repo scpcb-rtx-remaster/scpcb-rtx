@@ -7453,6 +7453,37 @@ Function ConsoleTeslaRoom%(r.Rooms)
 	Return False
 End Function
 
+Function ConsoleTeslaRoomDisabled%(r.Rooms)
+	Local e.Events
+	
+	If r = Null Then Return False
+	
+	For e.Events = Each Events
+		If e\room = r Then
+			If e\EventName = "room2tesla" Then
+				If e\EventState2 > 70 * 3.5 And e\EventState2 < 70 * 90 Then Return True
+			EndIf
+		EndIf
+	Next
+	
+	Return False
+End Function
+
+Function ConsoleClerkEnableTeslaRoom(r.Rooms)
+	Local e.Events
+	
+	If r = Null Then Return
+	
+	For e.Events = Each Events
+		If e\room = r Then
+			If e\EventName = "room2tesla" Then
+				e\EventState2 = 0
+				e\EventState3 = 0
+			EndIf
+		EndIf
+	Next
+End Function
+
 Function ConsoleClerkPathScore#(n.NPCs, targetX#, targetZ#)
 	Local i%
 	Local score#
@@ -7480,15 +7511,21 @@ End Function
 
 Function FindNearestConsoleTeslaRoom.Rooms(n.NPCs)
 	Local r.Rooms
-	Local best.Rooms
-	Local fallback.Rooms
+	Local bestEnabled.Rooms
+	Local bestDisabled.Rooms
+	Local fallbackEnabled.Rooms
+	Local fallbackDisabled.Rooms
 	Local dist#
-	Local fallbackDist# = 1000000.0
-	Local bestDist# = 1000000.0
+	Local fallbackEnabledDist# = 1000000.0
+	Local fallbackDisabledDist# = 1000000.0
+	Local bestEnabledDist# = 1000000.0
+	Local bestDisabledDist# = 1000000.0
 	Local target%
 	Local pathStatus%
 	Local pathScore#
-	Local foundPath%
+	Local foundEnabledPath%
+	Local foundDisabledPath%
+	Local disabled%
 	Local i%
 	Local targetX#
 	Local targetY#
@@ -7503,19 +7540,35 @@ Function FindNearestConsoleTeslaRoom.Rooms(n.NPCs)
 				targetY = EntityY(target, True)
 				targetZ = EntityZ(target, True)
 				dist = EntityDistance(n\Collider, target)
+				disabled = ConsoleTeslaRoomDisabled(r)
 				
-				If dist < fallbackDist Then
-					fallbackDist = dist
-					fallback = r
+				If disabled Then
+					If dist < fallbackDisabledDist Then
+						fallbackDisabledDist = dist
+						fallbackDisabled = r
+					EndIf
+				Else
+					If dist < fallbackEnabledDist Then
+						fallbackEnabledDist = dist
+						fallbackEnabled = r
+					EndIf
 				EndIf
 				
 				pathStatus = FindPath(n, targetX, targetY + 0.1, targetZ)
 				If pathStatus = 1 Then
 					pathScore = ConsoleClerkPathScore(n, targetX, targetZ)
-					If (Not foundPath) Or pathScore < bestDist Then
-						bestDist = pathScore
-						best = r
-						foundPath = True
+					If disabled Then
+						If (Not foundDisabledPath) Or pathScore < bestDisabledDist Then
+							bestDisabledDist = pathScore
+							bestDisabled = r
+							foundDisabledPath = True
+						EndIf
+					Else
+						If (Not foundEnabledPath) Or pathScore < bestEnabledDist Then
+							bestEnabledDist = pathScore
+							bestEnabled = r
+							foundEnabledPath = True
+						EndIf
 					EndIf
 				EndIf
 			EndIf
@@ -7528,8 +7581,63 @@ Function FindNearestConsoleTeslaRoom.Rooms(n.NPCs)
 		n\Path[i] = Null
 	Next
 	
-	If foundPath Then Return best
-	Return fallback
+	If foundEnabledPath Then Return bestEnabled
+	If foundDisabledPath Then Return bestDisabled
+	If fallbackEnabled <> Null Then Return fallbackEnabled
+	Return fallbackDisabled
+End Function
+
+
+
+Function ConsoleClerkSkipPathJitter(n.NPCs)
+	Local i%
+	Local nextIndex%
+	Local curr.WayPoints
+	Local nextp.WayPoints
+	Local distCurr#
+	Local distNext#
+	Local cx#
+	Local cz#
+	
+	While n\PathLocation <= 19
+		curr = n\Path[n\PathLocation]
+		If curr = Null Then
+			n\PathLocation = n\PathLocation + 1
+		Else
+			cx = EntityX(n\Collider, True)
+			cz = EntityZ(n\Collider, True)
+			distCurr = Distance(cx, cz, EntityX(curr\obj, True), EntityZ(curr\obj, True))
+			
+			If distCurr < 0.35 Then
+				n\PathLocation = n\PathLocation + 1
+			Else
+				nextp = Null
+				nextIndex = -1
+				For i = n\PathLocation + 1 To 19
+					If n\Path[i] <> Null Then
+						nextp = n\Path[i]
+						nextIndex = i
+						Exit
+					EndIf
+				Next
+				
+				If nextp <> Null Then
+					distNext = Distance(cx, cz, EntityX(nextp\obj, True), EntityZ(nextp\obj, True))
+					If distNext + 0.15 < distCurr Then
+						If EntityVisible(n\Collider, nextp\obj) Then
+							n\PathLocation = nextIndex
+						Else
+							Return
+						EndIf
+					Else
+						Return
+					EndIf
+				Else
+					Return
+				EndIf
+			EndIf
+		EndIf
+	Wend
 End Function
 
 Function ConsoleHumanHasBlockingNPC%(n.NPCs, checkDist#)
@@ -7555,10 +7663,15 @@ Function ConsoleClerkForceDoorOpen(d.Doors)
 	If d\obj = 0 Then Return
 	If d\IsElevatorDoor > 0 Then Return
 	
+	d\dist = 0
+	If d\fastopen < 1 Then d\fastopen = 1
+	
 	d\locked = False
 	If d\KeyCard > 0 Then d\KeyCard = 0
 	
 	If d\LinkedDoor <> Null Then
+		d\LinkedDoor\dist = 0
+		If d\LinkedDoor\fastopen < 1 Then d\LinkedDoor\fastopen = 1
 		d\LinkedDoor\locked = False
 		If d\LinkedDoor\KeyCard > 0 Then d\LinkedDoor\KeyCard = 0
 	EndIf
@@ -7571,6 +7684,17 @@ Function ConsoleClerkForceDoorOpen(d.Doors)
 			d\LinkedDoor\timerstate = d\LinkedDoor\timer
 		EndIf
 	EndIf
+End Function
+
+Function ConsoleClerkDoorReady%(d.Doors)
+	If d = Null Then Return True
+	If d\open = False Then Return False
+	If d\openstate < 150.0 Then Return False
+	If d\LinkedDoor <> Null Then
+		If d\LinkedDoor\open = False Then Return False
+		If d\LinkedDoor\openstate < 150.0 Then Return False
+	EndIf
+	Return True
 End Function
 
 Function ConsoleClerkOpenNearbyDoors(n.NPCs)
@@ -7587,6 +7711,8 @@ Function ConsoleClerkNullifyTeslaClerkEvent(r.Rooms, n.NPCs)
 	Local e.Events
 	
 	If r = Null Then Return
+	
+	ConsoleClerkEnableTeslaRoom(r)
 	
 	For e.Events = Each Events
 		If e\EventName = "room2tesla" And e\room = r Then
@@ -7627,6 +7753,7 @@ Function ConsoleClerkTriggerNearestTesla(n.NPCs)
 	Next
 	
 	If best <> Null Then
+		ConsoleClerkEnableTeslaRoom(best)
 		If best\Objects[3] <> 0 Then
 			PlaySound2(TeslaActivateSFX, Camera, best\Objects[3], 4.0, 0.5)
 			HideEntity best\Objects[4]
@@ -7637,6 +7764,8 @@ Function ConsoleClerkTriggerNearestTesla(n.NPCs)
 		For e.Events = Each Events
 			If e\room = best Then
 				If e\EventName = "room2tesla" Then
+					e\EventState2 = 0
+					e\EventState3 = 0
 					e\EventState = 1
 					Exit
 				EndIf
@@ -7653,10 +7782,16 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 	Local prevFrame#
 	Local blocked%
 	Local targetPvt%
+	Local lookPvt%
 	Local targetSpeed#
 	Local turnDelta#
 	Local wpX#
 	Local wpZ#
+	Local prevDist#
+	Local newDist#
+	Local pathDoor.Doors
+	Local doorDist#
+	Local doorWait%
 	
 	RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
 	prevFrame = AnimTime(n\obj)
@@ -7689,6 +7824,8 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 				n\PathLocation = 0
 				n\State2 = 0
 				n\State3 = 0
+				n\PrevX = EntityX(n\Collider, True)
+				n\PrevZ = EntityZ(n\Collider, True)
 				n\State = 101
 			EndIf
 		Case 101
@@ -7702,10 +7839,9 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 				n\PathStatus = 0
 				n\PathLocation = 0
 			Else
-				n\PathTimer = Max(n\PathTimer - FPSfactor, 0.0)
-				If n\PathStatus <> 1 Or n\PathTimer <= 0 Then
+				If n\PathStatus <> 1 Then
 					n\PathStatus = FindPath(n, n\EnemyX, n\EnemyY + 0.1, n\EnemyZ)
-					n\PathTimer = 70 * 5
+					n\PathTimer = 0
 				EndIf
 				
 				If n\PathStatus = 0 Then
@@ -7714,54 +7850,115 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 					n\State3 = 0
 					n\PathLocation = 0
 				ElseIf n\PathStatus = 1 Then
+					While n\PathLocation <= 19
+						If n\Path[n\PathLocation] = Null Then
+							n\PathLocation = n\PathLocation + 1
+						Else
+							Exit
+						EndIf
+					Wend
+					
 					If n\PathLocation > 19 Then
 						n\State = 102
 						n\State2 = 0
 						n\State3 = 0
 					Else
-						While n\Path[n\PathLocation] = Null
-							n\PathLocation = n\PathLocation + 1
-							If n\PathLocation > 19 Then Exit
-						Wend
+						wpX = EntityX(n\Path[n\PathLocation]\obj, True)
+						wpZ = EntityZ(n\Path[n\PathLocation]\obj, True)
+						doorWait = False
 						
-						If n\PathLocation > 19 Then
-							n\State = 102
-							n\State2 = 0
-							n\State3 = 0
-						Else
-							wpX = EntityX(n\Path[n\PathLocation]\obj, True)
-							wpZ = EntityZ(n\Path[n\PathLocation]\obj, True)
-							dist2 = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
-							
-							; Skip tiny/behind waypoints instead of circling on top of them.
-							If dist2 < 0.28 Then
-								n\PathLocation = n\PathLocation + 1
+						pathDoor = n\Path[n\PathLocation]\door
+						If n\PathLocation > 0 Then
+							If n\Path[n\PathLocation - 1] <> Null Then
+								d = n\Path[n\PathLocation - 1]\door
+								If d <> Null Then ConsoleClerkForceDoorOpen(d)
+							EndIf
+						EndIf
+						
+						If pathDoor <> Null Then
+							ConsoleClerkForceDoorOpen(pathDoor)
+							If pathDoor\frameobj <> 0 Then
+								doorDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), EntityX(pathDoor\frameobj, True), EntityZ(pathDoor\frameobj, True))
 							Else
-								PointEntity n\obj, n\Path[n\PathLocation]\obj
-								turnDelta = Abs(DeltaYaw(n\Collider, n\Path[n\PathLocation]\obj))
-								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 8.0), 0, True
-								
-								If n\PathLocation > 0 Then
-									If n\Path[n\PathLocation - 1] <> Null Then
-										d = n\Path[n\PathLocation - 1]\door
-										If d <> Null Then ConsoleClerkForceDoorOpen(d)
+								doorDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+							EndIf
+							
+							If doorDist < 1.55 Then
+								If ConsoleClerkDoorReady(pathDoor) = False Then doorWait = True
+							EndIf
+						EndIf
+						
+						prevDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+						
+						blocked = ConsoleHumanHasBlockingNPC(n, 0.72)
+						If blocked Or doorWait Then
+							targetSpeed = 0.0
+						Else
+							targetSpeed = 0.038
+						EndIf
+						
+						targetPvt = CreatePivot()
+						lookPvt = CreatePivot()
+						PositionEntity targetPvt, wpX, EntityY(n\Collider, True), wpZ, True
+						PositionEntity lookPvt, EntityX(n\Collider, True), EntityY(n\Collider, True), EntityZ(n\Collider, True), True
+						PointEntity lookPvt, targetPvt
+						turnDelta = Abs(angleDist(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True)))
+						RotateEntity n\Collider, 0.0, CurveAngle(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True), 5.5), 0.0, True
+						FreeEntity lookPvt
+						FreeEntity targetPvt
+						
+						; Slow down through hard corners so the route looks less robotic and
+						; so she does not overshoot a waypoint during a sharp turn.
+						If turnDelta > 65.0 Then targetSpeed = targetSpeed * 0.70
+						If turnDelta > 105.0 Then targetSpeed = targetSpeed * 0.55
+						
+						n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 12.0)
+						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+						newDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+						
+						If doorWait Then
+							n\State3 = 0
+							n\PathTimer = 0
+							n\PrevX = EntityX(n\Collider, True)
+							n\PrevZ = EntityZ(n\Collider, True)
+						ElseIf targetSpeed > 0.0 Then
+							If n\PathTimer <= 0.0 Then n\PathTimer = prevDist
+							If newDist < n\PathTimer - (0.008 * FPSfactor) Then
+								n\State3 = 0
+							ElseIf Distance(EntityX(n\Collider, True), EntityZ(n\Collider, True), n\PrevX, n\PrevZ) < 0.004 * FPSfactor Then
+								n\State3 = n\State3 + FPSfactor
+							ElseIf newDist + 0.02 >= n\PathTimer Then
+								n\State3 = n\State3 + FPSfactor
+							Else
+								n\State3 = 0
+							EndIf
+							n\PathTimer = newDist
+							n\PrevX = EntityX(n\Collider, True)
+							n\PrevZ = EntityZ(n\Collider, True)
+							
+							If n\State3 > 70 * 1.10 Then
+								ConsoleClerkOpenNearbyDoors(n)
+								If newDist < 1.35 And n\PathLocation < 19 Then
+									n\PathLocation = n\PathLocation + 1
+									n\PathTimer = 0
+									n\State3 = 0
+								Else
+									n\PathStatus = 0
+									n\PathTimer = 0
+									n\PathLocation = 0
+									n\State3 = 0
+									If dist < 3.0 Then
+										n\State = 102
+										n\State2 = 0
 									EndIf
 								EndIf
-								
-								If n\Path[n\PathLocation]\door <> Null Then ConsoleClerkForceDoorOpen(n\Path[n\PathLocation]\door)
-								
-								blocked = ConsoleHumanHasBlockingNPC(n, 0.72)
-								If blocked Then
-									targetSpeed = 0.0
-								Else
-									targetSpeed = 0.036
-									If turnDelta > 75.0 Then targetSpeed = 0.018
-								EndIf
-								
-								n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 10.0)
-								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
-								
-								If dist2 < 0.42 Then n\PathLocation = n\PathLocation + 1
+							EndIf
+						EndIf
+						
+						If doorWait = False Then
+							If (newDist < 0.32) Or ((prevDist < newDist) And (prevDist < 0.90)) Then
+								n\PathLocation = n\PathLocation + 1
+								n\PathTimer = 0
 							EndIf
 						EndIf
 					EndIf
@@ -7795,15 +7992,18 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 				n\PathLocation = 0
 			Else
 				targetPvt = CreatePivot()
+				lookPvt = CreatePivot()
 				PositionEntity targetPvt, n\EnemyX, EntityY(n\Collider), n\EnemyZ, True
-				PointEntity n\obj, targetPvt
-				turnDelta = Abs(DeltaYaw(n\Collider, targetPvt))
-				RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 6.0), 0, True
+				PositionEntity lookPvt, EntityX(n\Collider, True), EntityY(n\Collider, True), EntityZ(n\Collider, True), True
+				PointEntity lookPvt, targetPvt
+				turnDelta = Abs(angleDist(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True)))
+				RotateEntity n\Collider, 0.0, CurveAngle(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True), 5.0), 0.0, True
+				FreeEntity lookPvt
 				FreeEntity targetPvt
 				
-				targetSpeed = 0.038
-				If turnDelta > 80.0 Then targetSpeed = 0.020
-				n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 8.0)
+				targetSpeed = 0.040
+				If turnDelta > 70.0 Then targetSpeed = 0.032
+				n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 10.0)
 				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 			EndIf
 		Case 110
