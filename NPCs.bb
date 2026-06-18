@@ -3021,7 +3021,10 @@ If n = CurrD9341 Then
 		;[End Block]
 		Case NPCtypeD,NPCtypeClerk,NPCtypeJ,NPCtypeD2,NPCtypeD3,NPCtypeS1,NPCtypeS2,NPCtypeG,NPCtypeB1,NPCtypeB2 	;------------------------------------------------------------------------------------------------------------------
 				;[Block]
-				RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
+				If n\NPCtype = NPCtypeClerk And n\State >= 100 Then
+					UpdateClerkTeslaNPC(n)
+				Else
+					RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
 				
 				prevFrame = AnimTime(n\obj)
 				
@@ -3073,6 +3076,7 @@ If n = CurrD9341 Then
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 				
 				RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider)-180.0, 0
+				EndIf
 				;[End Block]
 			Case NPCtypeV
 				;[Block]
@@ -7436,6 +7440,406 @@ Function ConsoleNPCFindCeilingY#(x#, startY#, z#, fallback#)
 	Return ConsoleNPCMapPickY(x, startY, z, 12.0, fallback)
 End Function
 
+
+Function ConsoleTeslaRoom%(r.Rooms)
+	Local rn$
+	
+	If r = Null Then Return False
+	If r\RoomTemplate = Null Then Return False
+	
+	rn = Lower(r\RoomTemplate\Name)
+	If Instr(rn, "room2tesla") > 0 Then Return True
+	
+	Return False
+End Function
+
+Function ConsoleClerkPathScore#(n.NPCs, targetX#, targetZ#)
+	Local i%
+	Local score#
+	Local lastX#
+	Local lastZ#
+	Local wpX#
+	Local wpZ#
+	
+	lastX = EntityX(n\Collider, True)
+	lastZ = EntityZ(n\Collider, True)
+	
+	For i = 0 To 19
+		If n\Path[i] <> Null Then
+			wpX = EntityX(n\Path[i]\obj, True)
+			wpZ = EntityZ(n\Path[i]\obj, True)
+			score = score + Distance(lastX, lastZ, wpX, wpZ)
+			lastX = wpX
+			lastZ = wpZ
+		EndIf
+	Next
+	
+	score = score + Distance(lastX, lastZ, targetX, targetZ)
+	Return score
+End Function
+
+Function FindNearestConsoleTeslaRoom.Rooms(n.NPCs)
+	Local r.Rooms
+	Local best.Rooms
+	Local fallback.Rooms
+	Local dist#
+	Local fallbackDist# = 1000000.0
+	Local bestDist# = 1000000.0
+	Local target%
+	Local pathStatus%
+	Local pathScore#
+	Local foundPath%
+	Local i%
+	Local targetX#
+	Local targetY#
+	Local targetZ#
+	
+	For r.Rooms = Each Rooms
+		If ConsoleTeslaRoom(r) Then
+			target = r\Objects[2]
+			If target = 0 Then target = r\obj
+			If target <> 0 Then
+				targetX = EntityX(target, True)
+				targetY = EntityY(target, True)
+				targetZ = EntityZ(target, True)
+				dist = EntityDistance(n\Collider, target)
+				
+				If dist < fallbackDist Then
+					fallbackDist = dist
+					fallback = r
+				EndIf
+				
+				pathStatus = FindPath(n, targetX, targetY + 0.1, targetZ)
+				If pathStatus = 1 Then
+					pathScore = ConsoleClerkPathScore(n, targetX, targetZ)
+					If (Not foundPath) Or pathScore < bestDist Then
+						bestDist = pathScore
+						best = r
+						foundPath = True
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	n\PathStatus = 0
+	n\PathLocation = 0
+	For i = 0 To 19
+		n\Path[i] = Null
+	Next
+	
+	If foundPath Then Return best
+	Return fallback
+End Function
+
+Function ConsoleHumanHasBlockingNPC%(n.NPCs, checkDist#)
+	Local n2.NPCs
+	
+	For n2.NPCs = Each NPCs
+		If n2 <> n Then
+			If n2\Collider <> 0 Then
+				If (Not n2\IsDead) Then
+					If EntityDistance(n\Collider, n2\Collider) < checkDist Then
+						If Abs(DeltaYaw(n\Collider, n2\Collider)) < 55.0 Then Return True
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	Return False
+End Function
+
+Function ConsoleClerkForceDoorOpen(d.Doors)
+	If d = Null Then Return
+	If d\obj = 0 Then Return
+	If d\IsElevatorDoor > 0 Then Return
+	
+	d\locked = False
+	If d\KeyCard > 0 Then d\KeyCard = 0
+	
+	If d\LinkedDoor <> Null Then
+		d\LinkedDoor\locked = False
+		If d\LinkedDoor\KeyCard > 0 Then d\LinkedDoor\KeyCard = 0
+	EndIf
+	
+	If d\open = False Then
+		d\open = True
+		d\timerstate = d\timer
+		If d\LinkedDoor <> Null Then
+			d\LinkedDoor\open = True
+			d\LinkedDoor\timerstate = d\LinkedDoor\timer
+		EndIf
+	EndIf
+End Function
+
+Function ConsoleClerkOpenNearbyDoors(n.NPCs)
+	Local d.Doors
+	
+	For d.Doors = Each Doors
+		If d\obj <> 0 Then
+			If EntityDistance(n\Collider, d\obj) < 1.85 Then ConsoleClerkForceDoorOpen(d)
+		EndIf
+	Next
+End Function
+
+Function ConsoleClerkNullifyTeslaClerkEvent(r.Rooms, n.NPCs)
+	Local e.Events
+	
+	If r = Null Then Return
+	
+	For e.Events = Each Events
+		If e\EventName = "room2tesla" And e\room = r Then
+			If e\room\NPC[0] <> Null Then
+				If e\room\NPC[0] <> n Then
+					If e\room\NPC[0]\NPCtype = NPCtypeClerk And (Not e\room\NPC[0]\IsDead) Then
+						RemoveNPC(e\room\NPC[0])
+					EndIf
+				EndIf
+				e\room\NPC[0] = Null
+			EndIf
+			e\EventStr = "done"
+			Exit
+		EndIf
+	Next
+End Function
+
+Function ConsoleClerkTriggerNearestTesla(n.NPCs)
+	Local r.Rooms
+	Local e.Events
+	Local target%
+	Local dist#
+	Local bestDist# = 1000000.0
+	Local best.Rooms
+	
+	For r.Rooms = Each Rooms
+		If ConsoleTeslaRoom(r) Then
+			target = r\Objects[2]
+			If target = 0 Then target = r\obj
+			If target <> 0 Then
+				dist = EntityDistance(n\Collider, target)
+				If dist < bestDist Then
+					bestDist = dist
+					best = r
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	If best <> Null Then
+		If best\Objects[3] <> 0 Then
+			PlaySound2(TeslaActivateSFX, Camera, best\Objects[3], 4.0, 0.5)
+			HideEntity best\Objects[4]
+		Else
+			PlaySound_Strict TeslaActivateSFX
+		EndIf
+		
+		For e.Events = Each Events
+			If e\room = best Then
+				If e\EventName = "room2tesla" Then
+					e\EventState = 1
+					Exit
+				EndIf
+			EndIf
+		Next
+	EndIf
+End Function
+
+Function UpdateClerkTeslaNPC(n.NPCs)
+	Local r.Rooms
+	Local d.Doors
+	Local dist#
+	Local dist2#
+	Local prevFrame#
+	Local blocked%
+	Local targetPvt%
+	Local targetSpeed#
+	Local turnDelta#
+	Local wpX#
+	Local wpZ#
+	
+	RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
+	prevFrame = AnimTime(n\obj)
+	
+	If n\State = 101 Or n\State = 102 Then ConsoleClerkOpenNearbyDoors(n)
+	
+	Select n\State
+		Case 100
+			r = FindNearestConsoleTeslaRoom(n)
+			If r = Null Then
+				n\State = 0
+				n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
+				Animate2(n\obj, AnimTime(n\obj), 210, 235, 0.1)
+			Else
+				If r\Objects[2] <> 0 Then
+					n\EnemyX = EntityX(r\Objects[2], True)
+					n\EnemyY = EntityY(r\Objects[2], True)
+					n\EnemyZ = EntityZ(r\Objects[2], True)
+				Else
+					n\EnemyX = EntityX(r\obj, True)
+					n\EnemyY = EntityY(r\obj, True)
+					n\EnemyZ = EntityZ(r\obj, True)
+				EndIf
+				
+				; Prevent the chosen tesla room from spawning its normal scripted clerk.
+				ConsoleClerkNullifyTeslaClerkEvent(r, n)
+				
+				n\PathStatus = 0
+				n\PathTimer = 0
+				n\PathLocation = 0
+				n\State2 = 0
+				n\State3 = 0
+				n\State = 101
+			EndIf
+		Case 101
+			; Run through the waypoint path until the clerk is close enough to make a direct dash into the tesla field.
+			dist = Distance(EntityX(n\Collider), EntityZ(n\Collider), n\EnemyX, n\EnemyZ)
+			
+			If dist < 1.95 Then
+				n\State = 102
+				n\State2 = 0
+				n\State3 = 0
+				n\PathStatus = 0
+				n\PathLocation = 0
+			Else
+				n\PathTimer = Max(n\PathTimer - FPSfactor, 0.0)
+				If n\PathStatus <> 1 Or n\PathTimer <= 0 Then
+					n\PathStatus = FindPath(n, n\EnemyX, n\EnemyY + 0.1, n\EnemyZ)
+					n\PathTimer = 70 * 5
+				EndIf
+				
+				If n\PathStatus = 0 Then
+					n\State = 102
+					n\State2 = 0
+					n\State3 = 0
+					n\PathLocation = 0
+				ElseIf n\PathStatus = 1 Then
+					If n\PathLocation > 19 Then
+						n\State = 102
+						n\State2 = 0
+						n\State3 = 0
+					Else
+						While n\Path[n\PathLocation] = Null
+							n\PathLocation = n\PathLocation + 1
+							If n\PathLocation > 19 Then Exit
+						Wend
+						
+						If n\PathLocation > 19 Then
+							n\State = 102
+							n\State2 = 0
+							n\State3 = 0
+						Else
+							wpX = EntityX(n\Path[n\PathLocation]\obj, True)
+							wpZ = EntityZ(n\Path[n\PathLocation]\obj, True)
+							dist2 = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+							
+							; Skip tiny/behind waypoints instead of circling on top of them.
+							If dist2 < 0.28 Then
+								n\PathLocation = n\PathLocation + 1
+							Else
+								PointEntity n\obj, n\Path[n\PathLocation]\obj
+								turnDelta = Abs(DeltaYaw(n\Collider, n\Path[n\PathLocation]\obj))
+								RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 8.0), 0, True
+								
+								If n\PathLocation > 0 Then
+									If n\Path[n\PathLocation - 1] <> Null Then
+										d = n\Path[n\PathLocation - 1]\door
+										If d <> Null Then ConsoleClerkForceDoorOpen(d)
+									EndIf
+								EndIf
+								
+								If n\Path[n\PathLocation]\door <> Null Then ConsoleClerkForceDoorOpen(n\Path[n\PathLocation]\door)
+								
+								blocked = ConsoleHumanHasBlockingNPC(n, 0.72)
+								If blocked Then
+									targetSpeed = 0.0
+								Else
+									targetSpeed = 0.036
+									If turnDelta > 75.0 Then targetSpeed = 0.018
+								EndIf
+								
+								n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 10.0)
+								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+								
+								If dist2 < 0.42 Then n\PathLocation = n\PathLocation + 1
+							EndIf
+						EndIf
+					EndIf
+				Else
+					n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 10.0)
+					n\State2 = n\State2 + FPSfactor
+					If n\State2 > 70 * 3 Then
+						n\State = 100
+						n\State2 = 0
+					EndIf
+				EndIf
+			EndIf
+		Case 102
+			dist = Distance(EntityX(n\Collider), EntityZ(n\Collider), n\EnemyX, n\EnemyZ)
+			
+			If n\State2 = 0 Then
+				ConsoleClerkTriggerNearestTesla(n)
+				n\State2 = 1
+				n\State3 = 0
+			Else
+				n\State3 = n\State3 + FPSfactor
+			EndIf
+			
+			If dist < 0.26 Then
+				PositionEntity n\Collider, n\EnemyX, EntityY(n\Collider), n\EnemyZ, True
+				n\State = 110
+				n\State2 = 0
+				n\State3 = 0
+				n\CurrSpeed = 0.0
+				n\PathStatus = 0
+				n\PathLocation = 0
+			Else
+				targetPvt = CreatePivot()
+				PositionEntity targetPvt, n\EnemyX, EntityY(n\Collider), n\EnemyZ, True
+				PointEntity n\obj, targetPvt
+				turnDelta = Abs(DeltaYaw(n\Collider, targetPvt))
+				RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 6.0), 0, True
+				FreeEntity targetPvt
+				
+				targetSpeed = 0.038
+				If turnDelta > 80.0 Then targetSpeed = 0.020
+				n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 8.0)
+				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+			EndIf
+		Case 110
+			; Tesla death animation copied from the room event, but owned by this NPC so it works without e\room\NPC[0].
+			n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
+			AnimateNPC(n, 41, 60, 0.5, False)
+			If n\Frame >= 60 Or AnimTime(n\obj) >= 60 Then
+				n\IsDead = True
+				EntityType n\Collider, HIT_DEAD
+				SetNPCFrame(n, 57)
+				n\State = 111
+			EndIf
+		Case 111
+			n\CurrSpeed = 0.0
+			n\IsDead = True
+			EntityType n\Collider, HIT_DEAD
+			AnimateNPC(n, 57, 60, 0.5, False)
+	End Select
+	
+	If n\State = 101 Or n\State = 102 Then
+		If n\CurrSpeed > 0.01 Then
+			Animate2(n\obj, AnimTime(n\obj), 301, 319, n\CurrSpeed * 18.0)
+			If prevFrame < 309 And AnimTime(n\obj) => 309 Then
+				PlaySound2(StepSFX(GetStepSound(n\Collider), 1, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.3, 0.5))
+			ElseIf prevFrame =< 319 And AnimTime(n\obj) =< 301 Then
+				PlaySound2(StepSFX(GetStepSound(n\Collider), 1, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.3, 0.5))
+			EndIf
+		Else
+			Animate2(n\obj, AnimTime(n\obj), 210, 235, 0.1)
+		EndIf
+	EndIf
+	
+	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+	RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+End Function
+
 Function UpdateNaziOfficerNPC(n.NPCs)
 	Local pvt%
 	Local visible%
@@ -7906,8 +8310,11 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			n.NPCs = CreateNPC(NPCtypeTentacle, EntityX(Collider), EntityY(Collider), EntityZ(Collider))
 			consoleMSG = "SCP-035 tentacle spawned."
 			
-		Case "clerk"
+		Case "clerk", "teslaclerk", "tesla clerk"
 			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			n\State = 100
+			n\State2 = 0
+			n\State3 = 0
 			consoleMSG = "Clerk spawned."
 			
 		Default 
