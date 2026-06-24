@@ -715,7 +715,12 @@ Type Forest
 	Field Forest_Pivot%
 	
 	Field Door%[2]
+	Field DoorFrame%[2]
 	Field DetailEntities%[2]
+
+	; Three mirrored rows behind each exit (6 rows total).
+	Field FakeTileEntities%[(gridsize*6)+1]
+	Field FakeTileCount%
 End Type
 
 Function move_forward%(dir%,pathx%,pathy%,retval%=0)
@@ -1192,6 +1197,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 				PositionEntity frame,0,32.0*RoomScale,0,True
 				ScaleEntity frame,45*RoomScale,44*RoomScale,80*RoomScale,True
 				EntityParent frame,fr\DetailEntities[i]
+				fr\DoorFrame[i] = frame
 				
 				EntityType fr\DetailEntities[i],HIT_MAP
 				;EntityParent frame,fr\DetailEntities[i]
@@ -1205,6 +1211,9 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 			EndIf		
 		Next		
 	Next
+
+	; Build visual-only mirrored forest behind both exits.
+	CreateFakeForestRows(fr)
 
 	FreeTexture GroundTexture
 	FreeTexture PathTexture
@@ -1410,6 +1419,7 @@ Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
 							PositionEntity frame,0,32.0*RoomScale,0,True
 							ScaleEntity frame,45*RoomScale,44*RoomScale,80*RoomScale,True
 							EntityParent frame,fr\DetailEntities[i]
+							fr\DoorFrame[i] = frame
 							
 							EntityType fr\DetailEntities[i],HIT_MAP
 							EntityPickMode fr\DetailEntities[i],2
@@ -1441,6 +1451,55 @@ Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
 	CatchErrors("PlaceForest_MapCreator")
 End Function
 
+
+Function CreateFakeForestRows(fr.Forest)
+	Local side%,row%,tx%,srcTy%
+	Local src%,fake%
+	Local doorZ#,fakeZ#
+
+	fr\FakeTileCount = 0
+
+	; Mirror the first three playable rows across each exit's doorway plane.
+	; This creates visual-only forest behind the otherwise empty side.
+	For side = 0 To 1
+		If fr\DetailEntities[side]<>0 Then
+			doorZ = EntityZ(fr\DetailEntities[side],True)
+
+			For row = 1 To 3
+				If side=0 Then
+					srcTy = row
+				Else
+					srcTy = (gridsize-1)-row
+				EndIf
+
+				For tx = 0 To gridsize-1
+					src = fr\TileEntities[tx+(srcTy*gridsize)]
+
+					If src<>0 And fr\FakeTileCount<(gridsize*6) Then
+						; CopyEntity also copies the tile's child hierarchy,
+						; including its generated trees and rocks.
+						fake = CopyEntity(src,fr\Forest_Pivot)
+
+						fakeZ = (doorZ*2.0)-EntityZ(src,True)
+						PositionEntity fake,EntityX(src,True),EntityY(src,True),fakeZ,True
+
+						; Reverse the copied tile so the path/terrain continues
+						; outward from the rear side of the exit.
+						RotateEntity fake,EntityPitch(src,True),WrapAngle(EntityYaw(src,True)+180.0),EntityRoll(src,True),True
+
+						; These rows are visual-only.
+						EntityType fake,0
+						EntityPickMode fake,0
+
+						fr\FakeTileEntities[fr\FakeTileCount] = fake
+						fr\FakeTileCount = fr\FakeTileCount+1
+					EndIf
+				Next
+			Next
+		EndIf
+	Next
+End Function
+
 Function DestroyForest(fr.Forest, nullgrid%=True)
 	CatchErrors("Uncaught (DestroyForest)")
 	Local tx%,ty%
@@ -1452,8 +1511,17 @@ Function DestroyForest(fr.Forest, nullgrid%=True)
 			EndIf
 		Next
 	Next
+	For i = 0 To fr\FakeTileCount-1
+		If fr\FakeTileEntities[i]<>0 Then
+			FreeEntity fr\FakeTileEntities[i]
+			fr\FakeTileEntities[i] = 0
+		EndIf
+	Next
+	fr\FakeTileCount = 0
+
 	For i = 0 To 1
 		If fr\Door[i]<>0 Then FreeEntity fr\Door[i] : fr\Door[i] = 0
+		fr\DoorFrame[i] = 0
 		If fr\DetailEntities[i]<>0 Then FreeEntity fr\DetailEntities[i] : fr\DetailEntities[i] = 0
 	Next
 	If fr\Forest_Pivot<>0 Then FreeEntity fr\Forest_Pivot : fr\Forest_Pivot=0

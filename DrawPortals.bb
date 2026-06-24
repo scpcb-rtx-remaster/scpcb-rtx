@@ -176,12 +176,17 @@ Function UpdateDrawPortal(ndp.DrawPortal)
 
 	RotateEntity ndp\cam,ndp\campitch,ndp\camyaw,ndp\camroll,True
 	CameraZoom ndp\cam,ndp\camZoom
+	CameraClsMode ndp\cam,True,True
 
 	viewX = (ndp\texw-GraphicWidth)/2
 	viewY = (ndp\texh-GraphicHeight)/2
-	CameraViewport ndp\cam,viewX,viewY,GraphicWidth,GraphicHeight
 
 	SetBuffer(TextureBuffer(ndp\tex))
+	Cls
+	SetBuffer(BackBuffer())
+
+	; Render the forest through the real backbuffer. Unlike the texture target,
+	CameraViewport ndp\cam,0,0,GraphicWidth,GraphicHeight
 
 	HideEntity ndp\portal
 	ShowEntity ndp\cam
@@ -190,11 +195,12 @@ Function UpdateDrawPortal(ndp.DrawPortal)
 	Cls
 	RenderWorld
 
+	CopyRect 0,0,GraphicWidth,GraphicHeight,viewX,viewY,BackBuffer(),TextureBuffer(ndp\tex)
+
 	HideEntity ndp\cam
 	ShowEntity Camera
 	ShowEntity ndp\portal
-
-	SetBuffer(BackBuffer())
+	CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
 
 	UpdateDrawPortalUVs(ndp)
 End Function

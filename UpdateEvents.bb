@@ -6495,6 +6495,7 @@ dp\camZoom = Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan(ATan(Tan(FOV/2.0)*RealGra
                                 	;Local pvt%
                                 	Local ang#
 	                                Local usedDoor%
+	                                Local usedDoorIndex%
                                 	Local camOffsetX#
 	                                Local camOffsetY#
 	                                Local camOffsetZ#
@@ -6510,9 +6511,11 @@ dp\camZoom = Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan(ATan(Tan(FOV/2.0)*RealGra
 	
 	                                ; choose which forest door to render from based on the side of the room portal
                                     If ang > 90 And ang < 270 Then
-		                                usedDoor = fr\Door[0]
+		                                usedDoorIndex = 0
+		                                usedDoor = fr\Door[usedDoorIndex]
 	                                Else
-		                                usedDoor = fr\Door[1]
+		                                usedDoorIndex = 1
+		                                usedDoor = fr\Door[usedDoorIndex]
 	                                EndIf
 	
                                 	; camera offset in room-local portal space
@@ -6534,7 +6537,8 @@ Local parallaxX# = portalMoveScale
 Local parallaxZ# = portalMoveScale
 
 Local yBias# = 0.135+(CrouchState*0.015)
-Local doorDepthBias# = -1.8
+; rendering the portal texture.
+Local doorDepthBias# = -0.75
 
 TFormPoint EntityX(Camera,True),EntityY(Camera,True),EntityZ(Camera,True),0,dp\portal
 srcLocalX = TFormedX()
@@ -6567,7 +6571,14 @@ dp\camroll = EntityRoll(Camera,True)*portalRollScale
 	
 	                                UpdateForest(fr,dp\cam)
                                   	ClsColor 98,133,162
+
+	                                If fr\Door[usedDoorIndex]<>0 Then HideEntity fr\Door[usedDoorIndex]
+	                                If fr\DoorFrame[usedDoorIndex]<>0 Then HideEntity fr\DoorFrame[usedDoorIndex]
+
 	                                UpdateDrawPortal(dp)
+
+	                                If fr\Door[usedDoorIndex]<>0 Then ShowEntity fr\Door[usedDoorIndex]
+	                                If fr\DoorFrame[usedDoorIndex]<>0 Then ShowEntity fr\DoorFrame[usedDoorIndex]
                                 EndIf
 								
 								;teleport the player to the forest
