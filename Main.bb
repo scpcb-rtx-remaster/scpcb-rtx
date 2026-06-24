@@ -388,6 +388,8 @@ Global ThirdPersonHeight# = 0.16
 Global ThirdPersonTargetHeight# = 0.35 
 Global ThirdPersonCurrentHeight# = 0.16 
 Global ThirdPersonCurrentTargetHeight# = 0.35
+Global ThirdPersonPivotY# = 0.0
+Global ThirdPersonPivotReady% = False
 
 Global Playable% = True
 
@@ -5473,13 +5475,19 @@ Function SetupPlayerBodyNPC%()
 End Function
 
 Function UpdateThirdPersonCamera%()
-	If ThirdPerson = False Then Return
+	If ThirdPerson = False Then
+		ThirdPersonPivotReady = False
+		Return
+	EndIf
 	
 	Local targetHeight#
 	Local cameraHeight#
 	Local camPitch#
 	Local camYaw#
 	Local camRoll#
+	Local orbitPitch#
+	Local viewYaw#
+	Local desiredPivotY#
 	
 	targetHeight = ThirdPersonTargetHeight
 	cameraHeight = ThirdPersonHeight
@@ -5500,6 +5508,22 @@ Function UpdateThirdPersonCamera%()
 	MoveEntity Camera, 0.12, 0.0, -ThirdPersonDist
 	TranslateEntity Camera, 0.0, ThirdPersonCurrentHeight, 0.0, True
 	RotateEntity Camera, camPitch, camYaw, camRoll, True
+	viewYaw = EntityYaw(Camera, True)
+	camYaw = EntityYaw(Collider, True)
+	camRoll = EntityRoll(Camera, True)
+	orbitPitch = user_camera_pitch
+	desiredPivotY = EntityY(Collider, True) + ThirdPersonCurrentTargetHeight
+	If ThirdPersonPivotReady = False Then
+		ThirdPersonPivotY = desiredPivotY
+		ThirdPersonPivotReady = True
+	Else
+		ThirdPersonPivotY = CurveValue(desiredPivotY, ThirdPersonPivotY, 3.0)
+	EndIf
+	PositionEntity Camera, EntityX(Collider, True), ThirdPersonPivotY, EntityZ(Collider, True), True
+	RotateEntity Camera, orbitPitch, camYaw, 0.0, True
+	MoveEntity Camera, 0.12, 0.0, -ThirdPersonDist
+	TranslateEntity Camera, 0.0, ThirdPersonCurrentHeight, 0.0, True
+	RotateEntity Camera, camPitch, viewYaw, camRoll, True
 End Function
 
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
