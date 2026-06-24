@@ -7,6 +7,10 @@ Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtypePdPlane% = 17
 Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22
 Const NPCtypeD2% = 23, NPCtypeD3% = 24, NPCtypeS1% = 25, NPCtypeS2% = 26, NPCtypeJ% = 27
 Const NPCtypeV% = 28, NPCtypeG% = 29, NPCtypeC% = 30, NPCtypeB1% = 31, NPCtypeB2% = 32, NPCtypeNazi% = 33
+Const D9341F_KEY1% = 1, D9341F_KEY2% = 2, D9341F_OMNI% = 4, D9341F_LOCKDOWN% = 8
+Const D9341F_008% = 16, D9341F_RCCOFF% = 32, D9341F_079% = 64, D9341F_RCCON% = 128, D9341F_GATEB% = 256, D9341F_TESTROOMCLOSE% = 512
+Const D9341F_914DROP% = 1024, D9341F_914APPROACH% = 2048, D9341F_914STARTED% = 4096, D9341F_914OUTPUT% = 8192, D9341F_914OMNISPAWN% = 16384
+Const D9341F_SERVERS% = 32768
 
 Const NPCBones$ = "Data\NPCBones.ini"
 
@@ -61,6 +65,11 @@ Type NPCs
 	Field InFacility% = True
 	Field CanUseElevator% = False
 	Field CurrElevator.ElevatorObj
+	Field DoorTarget.Doors
+	Field LastDoor.Doors
+	Field TeslaRoom.Rooms
+	Field DoorRetry%, DoorWaitTimer#
+	Field GoalTimer#, GoalX#, GoalZ#
 	Field HP%
 	Field PathX#,PathZ#
 	Field Model$
@@ -98,7 +107,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 				n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
 			EndIf
 			
-			If SCP173Model$ = "Izumi Kato" Or "izumi kato scp-173" Or "Untitled 2004" Or "untitled 2004" Or "untitled 2004 scp-173" Then
+			If SCP173Model$ = "Izumi Kato" Or "izumikato" Or "untitled2004" Or "untitled 2004" Or "untitled 2004 scp-173" Then
 				IzumiKato$ = "True"
 				Loaded173Model$ = "Inward3D"
 				n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
@@ -345,7 +354,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.32
 			EntityType n\Collider, HIT_PLAYER
 			
-			n\obj = CopyEntity(ClassDObj)
+			n\obj = CopyEntity(D9341Obj)
 			
 			temp# = 0.5 / MeshWidth(n\obj)
 			ScaleEntity n\obj, temp, temp, temp
@@ -2972,53 +2981,12 @@ Function UpdateNPCs()
 				;[End Block]
 			Case NPCtypeD9341
 			;[Block]
-	RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
-	
-	prevFrame = AnimTime(n\obj)
-	
-If n = CurrD9341 Then
-	Select n\State
-		Case 0 ; idle
-			n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 212, 235, 0.10)
-			
-		Case 1 ; walk forward
-			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 236, 260, n\CurrSpeed * 15.0)
-			
-		Case 2 ; run
-			n\CurrSpeed = CurveValue(0.030, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 301, 319, n\CurrSpeed * 15.0)
-			
-		Case 3 ; crouch idle
-			n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 357, 381, 0.08)
-			
-		Case 4 ; crouch walk
-			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 382, 406, n\CurrSpeed * 15.0)
-			
-		Case 5 ; strafe left
-			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 281, 300, n\CurrSpeed * 16.0)
-			
-		Case 6 ; strafe right
-			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
-			Animate2(n\obj, AnimTime(n\obj), 261, 280, n\CurrSpeed * 16.0)
-			
-	    Case 7 ; walk backward
-	        n\CurrSpeed = CurveValue(-0.012, n\CurrSpeed, 5.0)
-	        AnimateNPC(n, 260, 236, n\CurrSpeed * 25)
-		Case 8 ; crouch backward
-	        n\CurrSpeed = CurveValue(-0.010, n\CurrSpeed, 5.0)
-	        AnimateNPC(n, 406, 382, n\CurrSpeed * 26)
-
-        Case 9 ; run backward
-	        n\CurrSpeed = CurveValue(-0.018, n\CurrSpeed, 5.0)
-	        AnimateNPC(n, 319, 301, n\CurrSpeed * 26)
-	End Select
-		EndIf
-		;[End Block]
+				If n = CurrD9341 And n\State < 100 Then
+					UpdateD9341BodyNPC(n)
+				Else
+					UpdateD9341GameNPC(n)
+				EndIf
+				;[End Block]
 		Case NPCtypeD,NPCtypeClerk,NPCtypeJ,NPCtypeD2,NPCtypeD3,NPCtypeS1,NPCtypeS2,NPCtypeG,NPCtypeB1,NPCtypeB2 	;------------------------------------------------------------------------------------------------------------------
 				;[Block]
 				If n\NPCtype = NPCtypeClerk And n\State >= 100 Then
@@ -7658,6 +7626,67 @@ Function ConsoleHumanHasBlockingNPC%(n.NPCs, checkDist#)
 	Return False
 End Function
 
+Function D9341AvoidBlockingNPC%(n.NPCs, checkDist#)
+	Local n2.NPCs
+	Local yaw#
+	Local sidestep#
+	
+	For n2.NPCs = Each NPCs
+		If n2 <> n Then
+			If n2\Collider <> 0 Then
+				If (Not n2\IsDead) Then
+					If EntityDistance(n\Collider, n2\Collider) < checkDist Then
+						yaw = DeltaYaw(n\Collider, n2\Collider)
+						If Abs(yaw) < 65.0 Then
+							sidestep = 0.014
+							If yaw < 0 Then
+								MoveEntity n\Collider, sidestep * FPSfactor, 0, 0
+							Else
+								MoveEntity n\Collider, -sidestep * FPSfactor, 0, 0
+							EndIf
+							n\PathStatus = 0
+							n\PathTimer = 0
+							n\PathLocation = 0
+							Return True
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	Return False
+End Function
+
+Function D9341NudgeTowardPoint(n.NPCs, x#, z#, amount#)
+	Local dx#
+	Local dz#
+	Local dist#
+	Local oldYaw#
+	Local targetPvt%
+	Local lookPvt%
+	
+	If n = Null Then Return
+	If amount <= 0 Then Return
+	If amount > 0.09 Then amount = 0.09
+	dx = x - EntityX(n\Collider, True)
+	dz = z - EntityZ(n\Collider, True)
+	dist = Sqr(dx * dx + dz * dz)
+	If dist < 0.05 Then Return
+	
+	oldYaw = EntityYaw(n\Collider, True)
+	targetPvt = CreatePivot()
+	lookPvt = CreatePivot()
+	PositionEntity targetPvt, x, EntityY(n\Collider, True), z, True
+	PositionEntity lookPvt, EntityX(n\Collider, True), EntityY(n\Collider, True), EntityZ(n\Collider, True), True
+	PointEntity lookPvt, targetPvt
+	RotateEntity n\Collider, 0, EntityYaw(lookPvt, True), 0, True
+	MoveEntity n\Collider, 0, 0, amount
+	RotateEntity n\Collider, 0, oldYaw, 0, True
+	FreeEntity lookPvt
+	FreeEntity targetPvt
+End Function
+
 Function ConsoleClerkForceDoorOpen(d.Doors)
 	If d = Null Then Return
 	If d\obj = 0 Then Return
@@ -8034,6 +8063,2428 @@ Function UpdateClerkTeslaNPC(n.NPCs)
 		Else
 			Animate2(n\obj, AnimTime(n\obj), 210, 235, 0.1)
 		EndIf
+	EndIf
+	
+	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+	RotateEntity n\obj, EntityPitch(n\Collider), EntityYaw(n\Collider) - 180.0, 0
+End Function
+
+Function D9341HasFlag%(n.NPCs, flag%)
+	Return ((Int(n\Reload) And flag) <> 0)
+End Function
+
+Function D9341AddFlag(n.NPCs, flag%)
+	n\Reload = Int(n\Reload) Or flag
+End Function
+
+Function D9341RemoveFlag(n.NPCs, flag%)
+	If D9341HasFlag(n, flag) Then n\Reload = Int(n\Reload) - flag
+End Function
+
+Function D9341ClearPath(n.NPCs)
+	Local i%
+	n\PathStatus = 0
+	n\PathTimer = 0
+	n\PathLocation = 0
+	For i = 0 To 19
+		n\Path[i] = Null
+	Next
+End Function
+
+Function D9341PathScore#(n.NPCs, targetX#, targetZ#)
+	Local i%
+	Local score#
+	Local lastX#
+	Local lastZ#
+	Local wpX#
+	Local wpZ#
+	
+	lastX = EntityX(n\Collider, True)
+	lastZ = EntityZ(n\Collider, True)
+	
+	For i = 0 To 19
+		If n\Path[i] <> Null Then
+			wpX = EntityX(n\Path[i]\obj, True)
+			wpZ = EntityZ(n\Path[i]\obj, True)
+			score = score + Distance(lastX, lastZ, wpX, wpZ)
+			lastX = wpX
+			lastZ = wpZ
+		EndIf
+	Next
+	
+	score = score + Distance(lastX, lastZ, targetX, targetZ)
+	Return score
+End Function
+
+Function D9341DirectTargetVisible%(n.NPCs, x#, y#, z#)
+	Local pvt%
+	Local result%
+	
+	pvt = CreatePivot()
+	PositionEntity pvt, x, y, z, True
+	result = EntityVisible(n\Collider, pvt)
+	FreeEntity pvt
+	Return result
+End Function
+
+Function D9341FindNearestRoom.Rooms(n.NPCs, roomName$)
+	Local r.Rooms
+	Local best.Rooms
+	Local fallback.Rooms
+	Local dist#
+	Local fallbackDist# = 1000000.0
+	Local bestScore# = 1000000.0
+	Local score#
+	Local status%
+	Local rn$
+	Local targetName$ = Lower(roomName)
+	Local tx#
+	Local ty#
+	Local tz#
+	
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate <> Null Then
+			rn = Lower(r\RoomTemplate\Name)
+			If rn = targetName Then
+				tx = EntityX(r\obj, True)
+				ty = EntityY(r\obj, True)
+				tz = EntityZ(r\obj, True)
+				dist = EntityDistance(n\Collider, r\obj)
+				If dist < fallbackDist Then
+					fallbackDist = dist
+					fallback = r
+				EndIf
+				status = FindPath(n, tx, ty + 0.1, tz)
+				If status = 1 Then
+					score = D9341PathScore(n, tx, tz)
+					If score < bestScore Then
+						bestScore = score
+						best = r
+					EndIf
+				ElseIf status = 0 And D9341DirectTargetVisible(n, tx, ty, tz) Then
+					If dist < bestScore Then
+						bestScore = dist
+						best = r
+					EndIf
+				EndIf
+		EndIf
+	EndIf
+	Next
+	
+	D9341ClearPath(n)
+	If best <> Null Then Return best
+	Return fallback
+End Function
+
+Function D9341NearestRoomByName.Rooms(n.NPCs, roomName$)
+	Local r.Rooms
+	Local best.Rooms
+	Local dist#
+	Local bestDist# = 1000000.0
+	Local rn$
+	Local targetName$ = Lower(roomName)
+	
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate <> Null Then
+			rn = Lower(r\RoomTemplate\Name)
+			If rn = targetName Then
+				dist = EntityDistance(n\Collider, r\obj)
+				If dist < bestDist Then
+					bestDist = dist
+					best = r
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	Return best
+End Function
+
+
+Function D9341FindGateRoom.Rooms(n.NPCs)
+	Local r.Rooms
+	
+	r = D9341FindNearestRoom(n, "gateb")
+	If r <> Null Then Return r
+	r = D9341FindNearestRoom(n, "gatebentrance")
+	If r <> Null Then Return r
+	r = D9341FindNearestRoom(n, "gateaentrance")
+	If r <> Null Then Return r
+	Return D9341FindNearestRoom(n, "gatea")
+End Function
+
+Function D9341FindNearestItem.Items(n.NPCs, itemName$)
+	Local it.Items
+	Local best.Items
+	Local fallback.Items
+	Local dist#
+	Local fallbackDist# = 1000000.0
+	Local bestScore# = 1000000.0
+	Local score#
+	Local status%
+	Local targetName$ = Lower(itemName)
+	Local tx#
+	Local ty#
+	Local tz#
+	
+	For it.Items = Each Items
+		If it\collider <> 0 Then
+			If it\Picked = False Then
+				If it\itemtemplate <> Null Then
+					If Lower(it\itemtemplate\name) = targetName Then
+						tx = EntityX(it\collider, True)
+						ty = EntityY(it\collider, True)
+						tz = EntityZ(it\collider, True)
+						dist = EntityDistance(n\Collider, it\collider)
+						If dist < fallbackDist Then
+							fallbackDist = dist
+							fallback = it
+						EndIf
+						status = FindPath(n, tx, ty + 0.1, tz)
+						If status = 1 Then
+							score = D9341PathScore(n, tx, tz)
+							If score < bestScore Then
+								bestScore = score
+								best = it
+							EndIf
+						ElseIf status = 0 And D9341DirectTargetVisible(n, tx, ty, tz) Then
+							If dist < bestScore Then
+								bestScore = dist
+								best = it
+							EndIf
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	D9341ClearPath(n)
+	If best <> Null Then Return best
+	Return fallback
+End Function
+
+
+Function D9341SetTarget(n.NPCs, x#, y#, z#)
+	n\EnemyX = x
+	n\EnemyY = y
+	n\EnemyZ = z
+	n\PathStatus = 0
+	n\PathTimer = 0
+	n\PathLocation = 0
+	n\PathX = 0
+	n\PathZ = 0
+	n\State = 101
+	n\State2 = 0
+	n\State3 = 0
+	n\Angle = 0
+	n\PrevX = EntityX(n\Collider, True)
+	n\PrevZ = EntityZ(n\Collider, True)
+End Function
+
+
+Function D9341SetRoomTarget%(n.NPCs, r.Rooms, objIndex%)
+	Local target%
+	
+	If r = Null Then Return False
+	If objIndex >= 0 Then target = r\Objects[objIndex]
+	If target = 0 Then target = r\obj
+	If target = 0 Then Return False
+	D9341SetTarget(n, EntityX(target, True), EntityY(target, True), EntityZ(target, True))
+	Return True
+End Function
+
+Function D9341SetItemTarget%(n.NPCs, it.Items)
+	If it = Null Then Return False
+	If it\collider = 0 Then Return False
+	D9341SetTarget(n, EntityX(it\collider, True), EntityY(it\collider, True), EntityZ(it\collider, True))
+	Return True
+End Function
+
+Function D9341LCZCheckpointLocked%()
+	Local e.Events
+	
+	For e.Events = Each Events
+		If e\EventName = "room2sl" Then
+			If e\EventState3 <> 0 Then Return True
+		EndIf
+	Next
+	
+	Return False
+End Function
+
+Function D9341KeyLevel%(n.NPCs)
+	If n = Null Then Return 0
+	If D9341HasFlag(n, D9341F_OMNI) Then Return 6
+	If D9341HasFlag(n, D9341F_KEY2) Then Return 2
+	If D9341HasFlag(n, D9341F_KEY1) Then Return 1
+	Return 0
+End Function
+
+Function D9341DoorInRoom%(d.Doors, roomName$)
+	If d = Null Then Return False
+	If d\room <> Null Then
+		If d\room\RoomTemplate <> Null Then
+			If Lower(d\room\RoomTemplate\Name) = Lower(roomName) Then Return True
+		EndIf
+	EndIf
+	If d\LinkedDoor <> Null Then
+		If d\LinkedDoor\room <> Null Then
+			If d\LinkedDoor\room\RoomTemplate <> Null Then
+				If Lower(d\LinkedDoor\room\RoomTemplate\Name) = Lower(roomName) Then Return True
+			EndIf
+		EndIf
+	EndIf
+	Return False
+End Function
+
+Function D9341DoorUsable%(n.NPCs, d.Doors)
+	If d = Null Then Return False
+	If d\obj = 0 Then Return False
+	If D9341DoorInRoom(d, "start") Then Return False
+	If d\IsElevatorDoor > 0 Then Return False
+	If d\KeyCard < 0 Then Return False
+	If d\locked Then Return False
+	If d\KeyCard > D9341KeyLevel(n) Then Return False
+	If d\LinkedDoor <> Null Then
+		If d\LinkedDoor\KeyCard > D9341KeyLevel(n) Then Return False
+		If d\LinkedDoor\locked Then Return False
+	EndIf
+	Return True
+End Function
+
+Function D9341OpenDoorNow%(n.NPCs, d.Doors)
+	Local sound%
+	Local dir%
+	
+	If D9341DoorUsable(n, d) = False Then Return False
+	
+	d\dist = 0
+	If d\fastopen < 1 Then d\fastopen = 1
+	If d\open = False Then
+		D9341PlayDoorUseSound(n, d)
+		d\open = True
+		d\timerstate = d\timer
+		If d\obj <> 0 Then
+			sound = Rand(0, 2)
+			dir = Min(d\dir, 3)
+			d\SoundCHN = PlaySound2(OpenDoorSFX(dir, sound), Camera, d\obj)
+		EndIf
+		If d\LinkedDoor <> Null Then
+			d\LinkedDoor\dist = 0
+			If d\LinkedDoor\fastopen < 1 Then d\LinkedDoor\fastopen = 1
+			If D9341DoorUsable(n, d\LinkedDoor) Then
+				d\LinkedDoor\open = True
+				d\LinkedDoor\timerstate = d\LinkedDoor\timer
+				If d\LinkedDoor\obj <> 0 Then
+					dir = Min(d\LinkedDoor\dir, 3)
+					d\LinkedDoor\SoundCHN = PlaySound2(OpenDoorSFX(dir, sound), Camera, d\LinkedDoor\obj)
+				EndIf
+			EndIf
+		EndIf
+	EndIf
+	Return True
+End Function
+
+Function D9341DoorReady%(d.Doors)
+	If d = Null Then Return True
+	If d\open = False Then Return False
+	If d\openstate < 150.0 Then Return False
+	If d\LinkedDoor <> Null Then
+		If d\LinkedDoor\open = False Then Return False
+		If d\LinkedDoor\openstate < 150.0 Then Return False
+	EndIf
+	Return True
+End Function
+
+Function D9341DoorKeycard%(d.Doors)
+	If d = Null Then Return False
+	If d\KeyCard > 0 Then Return True
+	If d\LinkedDoor <> Null Then
+		If d\LinkedDoor\KeyCard > 0 Then Return True
+	EndIf
+	Return False
+End Function
+
+Function D9341DoorButton%(n.NPCs, d.Doors)
+	Local i%
+	Local b%
+	Local dist#
+	Local best%
+	Local fallback%
+	Local bestDist# = 1000000.0
+	Local fallbackDist# = 1000000.0
+	
+	If d = Null Then Return 0
+	For i = 0 To 1
+		b = d\buttons[i]
+		If b <> 0 Then
+			dist = EntityDistance(n\Collider, b)
+			If EntityVisible(n\Collider, b) Then
+				If dist < bestDist Then
+					bestDist = dist
+					best = b
+				EndIf
+			EndIf
+			If dist < fallbackDist Then
+				fallbackDist = dist
+				fallback = b
+			EndIf
+		EndIf
+	Next
+	If d\LinkedDoor <> Null Then
+		For i = 0 To 1
+			b = d\LinkedDoor\buttons[i]
+			If b <> 0 Then
+				dist = EntityDistance(n\Collider, b)
+				If EntityVisible(n\Collider, b) Then
+					If dist < bestDist Then
+						bestDist = dist
+						best = b
+					EndIf
+				EndIf
+				If dist < fallbackDist Then
+					fallbackDist = dist
+					fallback = b
+				EndIf
+			EndIf
+		Next
+	EndIf
+	If best <> 0 Then Return best
+	Return fallback
+End Function
+
+Function D9341DoorRegularButton%(n.NPCs, d.Doors)
+	Local i%
+	Local b%
+	Local dist#
+	Local best%
+	Local bestDist# = 1000000.0
+	
+	If d = Null Then Return 0
+	For i = 0 To 1
+		b = d\buttons[i]
+		If b <> 0 Then
+			dist = EntityDistance(n\Collider, b)
+			If dist < bestDist Then
+				bestDist = dist
+				best = b
+			EndIf
+		EndIf
+	Next
+	If d\LinkedDoor <> Null Then
+		For i = 0 To 1
+			b = d\LinkedDoor\buttons[i]
+			If b <> 0 Then
+				dist = EntityDistance(n\Collider, b)
+				If dist < bestDist Then
+					bestDist = dist
+					best = b
+				EndIf
+			EndIf
+		Next
+	EndIf
+	Return best
+End Function
+
+Function D9341PlayDoorUseSound(n.NPCs, d.Doors)
+	Local b%
+	
+	b = D9341DoorButton(n, d)
+	If D9341DoorKeycard(d) Then
+		If b <> 0 Then
+			PlaySound2(KeyCardSFX1, Camera, b, 20.0, 1.0)
+		Else
+			PlaySound_Strict KeyCardSFX1
+		EndIf
+	Else
+		If b <> 0 Then
+			PlaySound2(ButtonSFX, Camera, b, 20.0, 1.0)
+		Else
+			PlaySound_Strict ButtonSFX
+		EndIf
+	EndIf
+End Function
+
+Function D9341CloseDoorNow(d.Doors)
+	Local sound%
+	Local dir%
+	
+	If d = Null Then Return
+	If D9341DoorInRoom(d, "start") Then Return
+	d\dist = 0
+	If d\open Then
+		d\open = False
+		sound = Rand(0, 2)
+		If d\obj <> 0 Then
+			dir = Min(d\dir, 3)
+			d\SoundCHN = PlaySound2(CloseDoorSFX(dir, sound), Camera, d\obj)
+		EndIf
+	EndIf
+	If d\LinkedDoor <> Null Then
+		d\LinkedDoor\dist = 0
+		If d\LinkedDoor\open Then
+			d\LinkedDoor\open = False
+			If d\LinkedDoor\obj <> 0 Then
+				dir = Min(d\LinkedDoor\dir, 3)
+				d\LinkedDoor\SoundCHN = PlaySound2(CloseDoorSFX(dir, sound), Camera, d\LinkedDoor\obj)
+			EndIf
+		EndIf
+	EndIf
+End Function
+
+
+Function D9341ClosePathDoorBehind(n.NPCs, d.Doors)
+	Local doorDist#
+	
+	If d = Null Then Return
+	If (Not NoTarget) And EntityDistance(n\Collider, Collider) < 3.0 Then Return
+	If d\obj = 0 Then Return
+	If d\IsElevatorDoor > 0 Then Return
+	If D9341DoorKeycard(d) Then Return
+	If d\frameobj <> 0 Then
+		doorDist = EntityDistance(n\Collider, d\frameobj)
+	Else
+		doorDist = EntityDistance(n\Collider, d\obj)
+	EndIf
+	If doorDist < 0.65 Or doorDist > 3.00 Then Return
+	If d\open Then D9341CloseDoorNow(d)
+End Function
+
+Function D9341CloseNearestDoorAt(n.NPCs, x#, z#)
+	Local d.Doors
+	Local i%
+	Local b%
+	Local dist#
+	Local npcDist#
+	Local best.Doors
+	Local bestDist# = 1000000.0
+	Local bestNPCDist# = 1000000.0
+	
+	For d.Doors = Each Doors
+		If d\obj <> 0 Then
+			If d\IsElevatorDoor = 0 Then
+				If D9341DoorKeycard(d) = False Then
+					For i = 0 To 1
+						b = d\buttons[i]
+						If b <> 0 Then
+							dist = Distance(EntityX(b, True), EntityZ(b, True), x, z)
+							npcDist = EntityDistance(n\Collider, b)
+							If dist < bestDist And npcDist < 2.65 Then
+								bestDist = dist
+								bestNPCDist = npcDist
+								best = d
+							EndIf
+						EndIf
+					Next
+					If d\LinkedDoor <> Null Then
+						For i = 0 To 1
+							b = d\LinkedDoor\buttons[i]
+							If b <> 0 Then
+								dist = Distance(EntityX(b, True), EntityZ(b, True), x, z)
+								npcDist = EntityDistance(n\Collider, b)
+								If dist < bestDist And npcDist < 2.65 Then
+									bestDist = dist
+									bestNPCDist = npcDist
+									best = d
+								EndIf
+							EndIf
+						Next
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	If best <> Null Then
+		If bestDist < 1.55 And bestNPCDist < 2.65 Then D9341CloseDoorNow(best)
+	EndIf
+End Function
+
+Function D9341StartCloseBehind%(n.NPCs, d.Doors, lookX#, lookZ#)
+	Local b%
+	Local doorDist#
+	Local sideYaw#
+	
+	If d = Null Then Return False
+	If (Not NoTarget) And EntityDistance(n\Collider, Collider) < 3.0 Then Return False
+	If d\IsElevatorDoor > 0 Then Return False
+	If D9341DoorKeycard(d) Then Return False
+	If d\open = False Then Return False
+	b = D9341DoorButton(n, d)
+	If b = 0 Then Return False
+	If d\frameobj <> 0 Then
+		doorDist = EntityDistance(n\Collider, d\frameobj)
+	Else
+		doorDist = EntityDistance(n\Collider, d\obj)
+	EndIf
+	If doorDist < 0.35 Or doorDist > 2.05 Then Return False
+	If EntityDistance(n\Collider, b) > 3.35 Then Return False
+	If D9341DoorAhead(n, d, 1.55) Then Return False
+	
+	n\Idle = n\State
+	n\State = 150
+	n\State2 = 0
+	n\State3 = -1
+	sideYaw = DeltaYaw(n\Collider, b)
+	If sideYaw > 0 Then n\State3 = 1
+	n\DoorTarget = d
+	n\PrevX = lookX
+	n\PrevZ = lookZ
+	n\PrevY = Distance(EntityX(n\Collider), EntityZ(n\Collider), EntityX(b, True), EntityZ(b, True))
+	n\PathX = EntityX(b, True)
+	n\PathZ = EntityZ(b, True)
+	n\CurrSpeed = -0.006
+	Return True
+End Function
+
+Function D9341DoorAhead%(n.NPCs, d.Doors, maxDist#)
+	Local yaw#
+	Local dist#
+	
+	If n = Null Then Return False
+	If d = Null Then Return False
+	If d\frameobj <> 0 Then
+		dist = EntityDistance(n\Collider, d\frameobj)
+		yaw = Abs(DeltaYaw(n\Collider, d\frameobj))
+	ElseIf d\obj <> 0 Then
+		dist = EntityDistance(n\Collider, d\obj)
+		yaw = Abs(DeltaYaw(n\Collider, d\obj))
+	Else
+		Return False
+	EndIf
+	If dist < maxDist And yaw < 82.0 Then Return True
+	Return False
+End Function
+
+Function D9341RouteToLockdownSwitch%(n.NPCs)
+	Local r.Rooms
+	
+	If n = Null Then Return False
+	If D9341LCZCheckpointLocked() = False Then Return False
+	r = D9341FindNearestRoom(n, "room2sl")
+	If r = Null Then Return False
+	
+	D9341RemoveFlag(n, D9341F_LOCKDOWN)
+	n\PrevState = 40
+	D9341SetRoom2SLTarget(n, r)
+	n\DoorRetry = 0
+	n\DoorWaitTimer = 0
+	n\LastDoor = Null
+	Return True
+End Function
+
+Function D9341SetRoom2SLTarget%(n.NPCs, r.Rooms)
+	Local target%
+	
+	If n = Null Then Return False
+	If r = Null Then Return False
+	If r\Objects[7] <> 0 Then
+		If EntityY(n\Collider, True) < EntityY(r\obj, True) + 360.0 * RoomScale Then
+			If EntityDistance(n\Collider, r\Objects[7]) > 0.95 Then target = r\Objects[7]
+		EndIf
+	EndIf
+	If target = 0 Then
+		If r\Objects[15] <> 0 Then
+			If EntityDistance(n\Collider, r\Objects[15]) > 0.95 Then target = r\Objects[15]
+		EndIf
+	EndIf
+	If target = 0 Then
+		If r\Objects[16] <> 0 Then
+			If EntityDistance(n\Collider, r\Objects[16]) > 0.95 Then target = r\Objects[16]
+		EndIf
+	EndIf
+	If target = 0 Then
+		If r\Objects[17] <> 0 Then
+			If EntityDistance(n\Collider, r\Objects[17]) > 0.95 Then target = r\Objects[17]
+		EndIf
+	EndIf
+	If target = 0 Then target = r\Levers[0]
+	If target = 0 Then Return D9341SetRoomTarget(n, r, 0)
+	D9341SetTarget(n, EntityX(target, True), EntityY(target, True), EntityZ(target, True))
+	Return True
+End Function
+
+Function D9341StartPlayerBypass%(n.NPCs)
+	Local dist#
+	Local yaw#
+	
+	If n = Null Then Return False
+	If n\State <> 101 Then Return False
+	If Collider = 0 Then Return False
+	If n\BlinkTimer > 0 Then Return False
+	dist = EntityDistance(n\Collider, Collider)
+	If dist > 0.62 Then Return False
+	yaw = Abs(DeltaYaw(n\Collider, Collider))
+	If yaw > 42.0 Then Return False
+	
+	n\Idle = n\State
+	n\State = 160
+	n\State2 = 0
+	n\State3 = 1
+	If EntityX(Collider, True) < EntityX(n\Collider, True) Then n\State3 = -1
+	n\SoundTimer = 0
+	n\CurrSpeed = 0
+	n\PathStatus = 0
+	n\PathTimer = 0
+	n\PathLocation = 0
+	n\PathX = 0
+	n\PathZ = 0
+	n\BlinkTimer = 70 * Rnd(2.0, 4.0)
+	Return True
+End Function
+
+Function D9341CloseRoomDoors(r.Rooms)
+	Local i%
+	
+	If r = Null Then Return
+	For i = 0 To 3
+		If r\RoomDoors[i] <> Null Then D9341CloseDoorNow(r\RoomDoors[i])
+	Next
+End Function
+
+Function D9341CloseTestroomAfterLeaving(n.NPCs)
+	Local r.Rooms
+	Local rn$
+	Local dist#
+	
+	If D9341HasFlag(n, D9341F_TESTROOMCLOSE) = False Then Return
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate <> Null Then
+			rn = Lower(r\RoomTemplate\Name)
+			If rn = "room2testroom" Or rn = "room2testroom2" Then
+				dist = EntityDistance(n\Collider, r\obj)
+				If dist > 14.0 And dist < 28.0 Then
+					D9341CloseRoomDoors(r)
+					D9341RemoveFlag(n, D9341F_TESTROOMCLOSE)
+					Return
+				EndIf
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function D9341OpenRoomDoors(n.NPCs, r.Rooms)
+	Local i%
+	
+	If r = Null Then Return
+	For i = 0 To 3
+		If r\RoomDoors[i] <> Null Then D9341OpenDoorNow(n, r\RoomDoors[i])
+	Next
+End Function
+
+Function D9341BadPathRoom%(w.WayPoints)
+	Return False
+End Function
+
+Function D9341TurnTowardPoint(n.NPCs, x#, z#, curve#)
+	Local targetPvt%
+	Local lookPvt%
+	
+	targetPvt = CreatePivot()
+	lookPvt = CreatePivot()
+	PositionEntity targetPvt, x, EntityY(n\Collider, True), z, True
+	PositionEntity lookPvt, EntityX(n\Collider, True), EntityY(n\Collider, True), EntityZ(n\Collider, True), True
+	PointEntity lookPvt, targetPvt
+	RotateEntity n\Collider, 0, CurveAngle(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True), curve), 0, True
+	FreeEntity lookPvt
+	FreeEntity targetPvt
+End Function
+
+Function D9341NearestTeslaRoom.Rooms(n.NPCs, maxDist#)
+	Local r.Rooms
+	Local best.Rooms
+	Local target%
+	Local dist#
+	Local bestDist# = 1000000.0
+	
+	For r.Rooms = Each Rooms
+		If ConsoleTeslaRoom(r) Then
+			target = r\Objects[2]
+			If target = 0 Then target = r\Objects[3]
+			If target = 0 Then target = r\obj
+			If target <> 0 Then
+				dist = EntityDistance(n\Collider, target)
+				If dist < maxDist And dist < bestDist Then
+					bestDist = dist
+					best = r
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	Return best
+End Function
+
+Function D9341TeslaExitObject%(n.NPCs, r.Rooms)
+	Local d5#
+	Local d6#
+	Local t5#
+	Local t6#
+	
+	If r = Null Then Return 0
+	If r\Objects[5] = 0 Then Return r\Objects[6]
+	If r\Objects[6] = 0 Then Return r\Objects[5]
+	d5 = EntityDistance(n\Collider, r\Objects[5])
+	d6 = EntityDistance(n\Collider, r\Objects[6])
+	t5 = Distance(EntityX(r\Objects[5], True), EntityZ(r\Objects[5], True), n\EnemyX, n\EnemyZ)
+	t6 = Distance(EntityX(r\Objects[6], True), EntityZ(r\Objects[6], True), n\EnemyX, n\EnemyZ)
+	If Abs(t5 - t6) > 0.25 Then
+		If t5 < t6 Then Return r\Objects[5]
+		Return r\Objects[6]
+	EndIf
+	If d5 > d6 Then Return r\Objects[5]
+	Return r\Objects[6]
+End Function
+
+Function D9341TriggerTeslaRoom(r.Rooms)
+	Local e.Events
+	
+	If r = Null Then Return
+	ConsoleClerkEnableTeslaRoom(r)
+	If r\Objects[3] <> 0 Then
+		ShowEntity r\Objects[3]
+		PlaySound2(TeslaActivateSFX, Camera, r\Objects[3], 4.0, 0.5)
+		If r\Objects[4] <> 0 Then HideEntity r\Objects[4]
+	Else
+		PlaySound_Strict TeslaActivateSFX
+	EndIf
+	For e.Events = Each Events
+		If e\room = r Then
+			If e\EventName = "room2tesla" Then
+				e\EventState2 = 0
+				e\EventState3 = 0
+				e\EventState = 1
+				If e\SoundCHN <> 0 Then StopChannel(e\SoundCHN)
+				If r\Objects[3] <> 0 Then e\SoundCHN = PlaySound2(TeslaActivateSFX, Camera, r\Objects[3], 4.0, 0.5)
+				Exit
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function D9341ResetTeslaRoom(r.Rooms)
+	Local e.Events
+	
+	If r = Null Then Return
+	If r\Objects[3] <> 0 Then HideEntity r\Objects[3]
+	If r\Objects[4] <> 0 Then HideEntity r\Objects[4]
+	For e.Events = Each Events
+		If e\room = r Then
+			If e\EventName = "room2tesla" Then
+				e\EventState = 0
+				e\EventState2 = Max(e\EventState2, 70 * 3.5)
+				e\EventState3 = Max(e\EventState3, 140)
+				If e\SoundCHN <> 0 Then StopChannel(e\SoundCHN) : e\SoundCHN = 0
+				Exit
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function D9341MaybeStartTeslaReaction%(n.NPCs)
+	Local r.Rooms
+	Local exitObj%
+	Local latchObj%
+	
+	If n\State <> 101 Then Return False
+	If n\LastDist > 0 Then Return False
+	If n\TeslaRoom <> Null Then
+		latchObj = n\TeslaRoom\Objects[2]
+		If latchObj = 0 Then latchObj = n\TeslaRoom\Objects[3]
+		If latchObj = 0 Then latchObj = n\TeslaRoom\obj
+		If latchObj <> 0 Then
+			If EntityDistance(n\Collider, latchObj) > 3.8 Then n\TeslaRoom = Null
+		Else
+			n\TeslaRoom = Null
+		EndIf
+	EndIf
+	r = D9341NearestTeslaRoom(n, 1.55)
+	If r = Null Then Return False
+	If n\TeslaRoom = r Then Return False
+	If r\Objects[2] = 0 Then Return False
+	exitObj = D9341TeslaExitObject(n, r)
+	If exitObj = 0 Then Return False
+	n\TeslaRoom = r
+	n\Idle = n\State
+	n\State = 140
+	n\State2 = 0
+	n\State3 = 0
+	n\Angle = 0
+	n\PathX = EntityX(exitObj, True)
+	n\PathZ = EntityZ(exitObj, True)
+	n\PrevX = EntityX(r\Objects[2], True)
+	n\PrevZ = EntityZ(r\Objects[2], True)
+	n\CurrSpeed = 0
+	Return True
+End Function
+
+Function D9341MaybeStartServerRoom%(n.NPCs)
+	Local r.Rooms
+	
+	If n = Null Then Return False
+	If n\State <> 101 Then Return False
+	If D9341HasFlag(n, D9341F_SERVERS) Then Return False
+	r = D9341NearestRoomByName(n, "room2servers")
+	If r = Null Then Return False
+	If EntityDistance(n\Collider, r\obj) > 6.0 Then Return False
+	
+	n\Idle = n\State
+	n\State = 170
+	n\State2 = 0
+	n\State3 = 0
+	n\PrevX = n\EnemyX
+	n\PrevY = 0
+	n\PrevZ = n\EnemyZ
+	n\Angle = n\EnemyY
+	n\PathStatus = 0
+	n\PathTimer = 0
+	n\PathLocation = 0
+	Return True
+End Function
+
+Function D9341StartStuckWander%(n.NPCs)
+	If n = Null Then Return False
+	If n\State <> 101 Then Return False
+	
+	n\Idle = n\State
+	n\State = 180
+	n\State2 = 0
+	n\State3 = 1
+	If Rand(0, 1) = 0 Then n\State3 = -1
+	n\Angle = WrapAngle(EntityYaw(n\Collider, True) + Rnd(-135.0, 135.0))
+	n\CurrSpeed = 0
+	n\PathStatus = 0
+	n\PathTimer = 0
+	n\PathLocation = 0
+	n\PathX = 0
+	n\PathZ = 0
+	Return True
+End Function
+
+Function D9341ForwardBlocked%(n.NPCs, yaw#, checkDist#)
+	Local pvt%
+	Local hit%
+	
+	If n = Null Then Return False
+	pvt = CreatePivot()
+	PositionEntity pvt, EntityX(n\Collider, True), EntityY(n\Collider, True) + 0.22, EntityZ(n\Collider, True), True
+	RotateEntity pvt, 0, yaw, 0, True
+	HideEntity n\Collider
+	EntityPick pvt, checkDist
+	hit = PickedEntity()
+	ShowEntity n\Collider
+	FreeEntity pvt
+	If hit <> 0 Then Return True
+	Return False
+End Function
+
+Function D9341SteerAroundWall%(n.NPCs, targetX#, targetZ#)
+	Local yaw#
+	Local targetYaw#
+	Local leftYaw#
+	Local rightYaw#
+	Local leftBlocked%
+	Local rightBlocked%
+	Local chosenYaw#
+	
+	If n = Null Then Return False
+	yaw = EntityYaw(n\Collider, True)
+	If D9341ForwardBlocked(n, yaw, 0.52) = False Then Return False
+	
+	targetYaw = VectorYaw(targetX - EntityX(n\Collider, True), 0, targetZ - EntityZ(n\Collider, True))
+	leftYaw = WrapAngle(yaw - 58.0)
+	rightYaw = WrapAngle(yaw + 58.0)
+	leftBlocked = D9341ForwardBlocked(n, leftYaw, 0.48)
+	rightBlocked = D9341ForwardBlocked(n, rightYaw, 0.48)
+	
+	If leftBlocked And rightBlocked Then
+		chosenYaw = WrapAngle(yaw + 145.0)
+	ElseIf leftBlocked Then
+		chosenYaw = rightYaw
+	ElseIf rightBlocked Then
+		chosenYaw = leftYaw
+	ElseIf Abs(angleDist(leftYaw, targetYaw)) < Abs(angleDist(rightYaw, targetYaw)) Then
+		chosenYaw = leftYaw
+	Else
+		chosenYaw = rightYaw
+	EndIf
+	
+	RotateEntity n\Collider, 0, CurveAngle(chosenYaw, yaw, 3.0), 0, True
+	Return True
+End Function
+
+Function D9341CanLiftNudge%(n.NPCs)
+	Local r.Rooms
+	Local rn$
+	Local dist#
+	
+	If n = Null Then Return False
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate <> Null Then
+			rn = Lower(r\RoomTemplate\Name)
+			If rn = "room2doors" Or rn = "914" Or rn = "room513" Or Instr(rn, "513") > 0 Then
+				dist = Distance(EntityX(n\Collider, True), EntityZ(n\Collider, True), EntityX(r\obj, True), EntityZ(r\obj, True))
+				If dist < 8.0 Then Return True
+			EndIf
+		EndIf
+	Next
+	Return False
+End Function
+
+Function D9341LiftNudgeToward%(n.NPCs, x#, z#)
+	Local oldYaw#
+	Local targetYaw#
+	
+	If D9341CanLiftNudge(n) = False Then Return False
+	oldYaw = EntityYaw(n\Collider, True)
+	targetYaw = VectorYaw(x - EntityX(n\Collider, True), 0, z - EntityZ(n\Collider, True))
+	RotateEntity n\Collider, 0, targetYaw, 0, True
+	TranslateEntity n\Collider, 0, 0.040, 0, True
+	MoveEntity n\Collider, 0, 0, 0.075
+	RotateEntity n\Collider, 0, oldYaw, 0, True
+	ResetEntity n\Collider
+	Return True
+End Function
+
+Function D9341SetRandomRoomTarget%(n.NPCs)
+	Local r.Rooms
+	Local pick.Rooms
+	Local rn$
+	Local attempts%
+	
+	If n = Null Then Return False
+	For attempts = 0 To 18
+		For r.Rooms = Each Rooms
+			If r\RoomTemplate <> Null Then
+				rn = Lower(r\RoomTemplate\Name)
+				If rn <> "gatea" And rn <> "exit1" And rn <> "pocketdimension" And rn <> "dimension1499" Then
+					If Rand(1, 9) = 1 Then
+						pick = r
+						Exit
+					EndIf
+				EndIf
+			EndIf
+		Next
+		If pick <> Null Then Exit
+	Next
+	
+	If pick = Null Then Return False
+	n\PrevState = 0
+	Return D9341SetRoomTarget(n, pick, 0)
+End Function
+
+Function D9341SkipCurrentObjective(n.NPCs)
+	If n = Null Then Return
+	
+	Select Int(n\PrevState)
+		Case 10
+			D9341AddFlag(n, D9341F_KEY1)
+		Case 20, 25
+			D9341AddFlag(n, D9341F_KEY1)
+			D9341AddFlag(n, D9341F_KEY2)
+		Case 30, 31
+			D9341AddFlag(n, D9341F_OMNI)
+		Case 40
+			D9341AddFlag(n, D9341F_LOCKDOWN)
+		Case 50
+			D9341AddFlag(n, D9341F_008)
+		Case 60
+			D9341AddFlag(n, D9341F_RCCOFF)
+		Case 70
+			D9341AddFlag(n, D9341F_079)
+		Case 80
+			D9341AddFlag(n, D9341F_RCCON)
+		Default
+			If D9341SetRandomRoomTarget(n) Then Return
+	End Select
+	
+	n\GoalTimer = 0
+	D9341ChooseNextObjective(n)
+End Function
+
+Function D9341UpdateIdleWatchdog(n.NPCs)
+	Local moved#
+	
+	If n = Null Then Return
+	If n\State <> 101 And n\State <> 102 Then
+		n\GoalTimer = 0
+		n\GoalX = EntityX(n\Collider, True)
+		n\GoalZ = EntityZ(n\Collider, True)
+		Return
+	EndIf
+	If Int(n\PrevState) = 30 Or Int(n\PrevState) = 31 Or Int(n\PrevState) = 70 Then
+		n\GoalTimer = 0
+		n\GoalX = EntityX(n\Collider, True)
+		n\GoalZ = EntityZ(n\Collider, True)
+		Return
+	EndIf
+	
+	If n\GoalTimer <= 0 Then
+		n\GoalX = EntityX(n\Collider, True)
+		n\GoalZ = EntityZ(n\Collider, True)
+	EndIf
+	moved = Distance(EntityX(n\Collider, True), EntityZ(n\Collider, True), n\GoalX, n\GoalZ)
+	If moved > 0.11 Then
+		n\GoalTimer = 0
+		n\GoalX = EntityX(n\Collider, True)
+		n\GoalZ = EntityZ(n\Collider, True)
+		Return
+	EndIf
+	
+	n\GoalTimer = n\GoalTimer + FPSfactor
+	If n\State = 101 Then
+		If n\GoalTimer > 70 * 1.35 Then
+			n\GoalTimer = 0
+			If D9341StartStuckWander(n) = False Then D9341SetRandomRoomTarget(n)
+		EndIf
+	ElseIf n\GoalTimer > 70 * 1.8 Then
+		n\GoalTimer = 0
+		D9341SkipCurrentObjective(n)
+	EndIf
+End Function
+
+Function D9341Remove914InputKey2(r.Rooms)
+	Local it.Items
+	
+	If r = Null Then Return
+	If r\Objects[2] = 0 Then Return
+	For it.Items = Each Items
+		If it\collider <> 0 Then
+			If it\Picked = False Then
+				If it\itemtemplate <> Null Then
+					If Lower(it\itemtemplate\name) = "key2" Then
+						If Distance(EntityX(it\collider), EntityZ(it\collider), EntityX(r\Objects[2], True), EntityZ(r\Objects[2], True)) < 180.0 * RoomScale Then
+							RemoveItem(it)
+							Return
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function D9341Remove914OutputOmni(r.Rooms)
+	Local it.Items
+	
+	If r = Null Then Return
+	If r\Objects[3] = 0 Then Return
+	For it.Items = Each Items
+		If it\collider <> 0 Then
+			If it\Picked = False Then
+				If it\itemtemplate <> Null Then
+					If Lower(it\itemtemplate\name) = "key6" Then
+						If Distance(EntityX(it\collider), EntityZ(it\collider), EntityX(r\Objects[3], True), EntityZ(r\Objects[3], True)) < 260.0 * RoomScale Then
+							RemoveItem(it)
+							Return
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+End Function
+
+Function D9341Set914OutputWaitTarget%(n.NPCs, r.Rooms)
+	Local d.Doors
+	Local pvt%
+	Local x#
+	Local y#
+	Local z#
+	Local vx#
+	Local vz#
+	Local dist#
+	
+	If n = Null Then Return False
+	If r = Null Then Return False
+	
+	d = r\RoomDoors[1]
+	If d <> Null Then
+		If d\frameobj <> 0 Then
+			pvt = CreatePivot()
+			PositionEntity pvt, EntityX(d\frameobj, True), EntityY(r\obj, True), EntityZ(d\frameobj, True), True
+			RotateEntity pvt, 0, EntityYaw(d\frameobj, True), 0, True
+			MoveEntity pvt, 0.34, 0, 0.68
+			x = EntityX(pvt, True)
+			y = EntityY(r\obj, True)
+			z = EntityZ(pvt, True)
+			FreeEntity pvt
+			D9341SetTarget(n, x, y, z)
+			Return True
+		ElseIf d\obj <> 0 Then
+			pvt = CreatePivot()
+			PositionEntity pvt, EntityX(d\obj, True), EntityY(r\obj, True), EntityZ(d\obj, True), True
+			RotateEntity pvt, 0, EntityYaw(d\obj, True), 0, True
+			MoveEntity pvt, 0.34, 0, 0.68
+			x = EntityX(pvt, True)
+			y = EntityY(r\obj, True)
+			z = EntityZ(pvt, True)
+			FreeEntity pvt
+			D9341SetTarget(n, x, y, z)
+			Return True
+		EndIf
+	EndIf
+	
+	If r\Objects[3] = 0 Then Return False
+	
+	x = EntityX(r\Objects[3], True)
+	y = EntityY(r\Objects[3], True)
+	z = EntityZ(r\Objects[3], True)
+	vx = EntityX(r\obj, True) - x
+	vz = EntityZ(r\obj, True) - z
+	dist = Sqr(vx * vx + vz * vz)
+	If dist < 0.01 Then Return D9341SetRoomTarget(n, r, 3)
+	x = x + (vx / dist) * 1.35
+	z = z + (vz / dist) * 1.35
+	D9341SetTarget(n, x, y, z)
+	Return True
+End Function
+
+Function D9341ForceRoomDoorsOpen(r.Rooms)
+	Local i%
+	
+	If r = Null Then Return
+	For i = 0 To 3
+		If r\RoomDoors[i] <> Null Then
+			r\RoomDoors[i]\dist = 0
+			If r\RoomDoors[i]\open = False And r\RoomDoors[i]\locked = False And r\RoomDoors[i]\KeyCard <= 0 Then r\RoomDoors[i]\open = True
+		EndIf
+	Next
+End Function
+
+Function D9341ChooseNextObjective(n.NPCs)
+	Local it.Items
+	Local r.Rooms
+	
+	If (Not D9341HasFlag(n, D9341F_KEY1)) And (Not D9341HasFlag(n, D9341F_KEY2)) And (Not D9341HasFlag(n, D9341F_OMNI)) Then
+		it = D9341FindNearestItem(n, "key1")
+		If it <> Null Then
+			n\PrevState = 10
+			D9341SetItemTarget(n, it)
+			Return
+		EndIf
+		it = D9341FindNearestItem(n, "key2")
+		If it <> Null Then
+			n\PrevState = 20
+			D9341SetItemTarget(n, it)
+			Return
+		EndIf
+		n\PrevState = 25
+		n\State = 102
+		n\State2 = 0
+		n\State3 = 0
+		Return
+	EndIf
+	
+	If (Not D9341HasFlag(n, D9341F_KEY2)) And (Not D9341HasFlag(n, D9341F_OMNI)) Then
+		it = D9341FindNearestItem(n, "key2")
+		If it <> Null Then
+			n\PrevState = 20
+			D9341SetItemTarget(n, it)
+			Return
+		EndIf
+		r = D9341FindNearestRoom(n, "room2testroom2")
+		If r = Null Then r = D9341FindNearestRoom(n, "room2testroom")
+		If r <> Null Then
+			n\PrevState = 20
+			D9341SetRoomTarget(n, r, 0)
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_KEY2)
+	EndIf
+	
+	If (Not D9341HasFlag(n, D9341F_OMNI)) Then
+		r = D9341FindNearestRoom(n, "914")
+		If r <> Null Then
+			n\PrevState = 30
+			D9341SetRoomTarget(n, r, 2)
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_OMNI)
+	EndIf
+	
+	If D9341LCZCheckpointLocked() And (Not D9341HasFlag(n, D9341F_LOCKDOWN)) Then
+		r = D9341FindNearestRoom(n, "room2sl")
+		If r <> Null Then
+			n\PrevState = 40
+			D9341SetRoom2SLTarget(n, r)
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_LOCKDOWN)
+	EndIf
+	
+	If Not D9341HasFlag(n, D9341F_008) Then
+		r = D9341FindNearestRoom(n, "008")
+		If r <> Null Then
+			n\PrevState = 50
+			If r\RoomDoors[0] <> Null Then r\RoomDoors[0]\locked = False : r\RoomDoors[0]\open = True
+			If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\locked = False : r\RoomDoors[1]\open = True
+			If r\Objects[1] <> 0 Then
+				D9341SetRoomTarget(n, r, 1)
+			Else
+				D9341SetRoomTarget(n, r, 0)
+			EndIf
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_008)
+	EndIf
+	
+	If RemoteDoorOn And (Not D9341HasFlag(n, D9341F_RCCOFF)) Then
+		r = D9341FindNearestRoom(n, "room2ccont")
+		If r <> Null Then
+			n\PrevState = 60
+			D9341SetRoomTarget(n, r, 5)
+			Return
+		EndIf
+		RemoteDoorOn = False
+		D9341AddFlag(n, D9341F_RCCOFF)
+	EndIf
+	
+	If Not D9341HasFlag(n, D9341F_079) Then
+		r = D9341FindNearestRoom(n, "room079")
+		If r <> Null Then
+			n\PrevState = 70
+			D9341SetRoomTarget(n, r, 0)
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_079)
+	EndIf
+	
+	If Not D9341HasFlag(n, D9341F_RCCON) Then
+		r = D9341FindNearestRoom(n, "room2ccont")
+		If r <> Null Then
+			n\PrevState = 80
+			D9341SetRoomTarget(n, r, 5)
+			Return
+		EndIf
+		RemoteDoorOn = True
+		D9341AddFlag(n, D9341F_RCCON)
+	EndIf
+	
+	If Not D9341HasFlag(n, D9341F_GATEB) Then
+		r = D9341FindGateRoom(n)
+		If r <> Null Then
+			n\PrevState = 90
+			D9341SetRoomTarget(n, r, 0)
+			Return
+		EndIf
+		D9341AddFlag(n, D9341F_GATEB)
+	EndIf
+	
+	n\State = 0
+	n\CurrSpeed = 0
+End Function
+
+Function D9341FollowTarget%(n.NPCs, finalDist#)
+	Local dist#
+	Local prevDist#
+	Local newDist#
+	Local movedDist#
+	Local wpX#
+	Local wpY#
+	Local wpZ#
+	Local targetPvt%
+	Local lookPvt%
+	Local targetSpeed#
+	Local turnDelta#
+	Local d.Doors
+	Local pathDoor.Doors
+	Local doorDist#
+	Local doorWait%
+	Local sprinting%
+	Local directMode%
+	Local blocked%
+	Local button%
+	Local buttonDist#
+	Local keyDoor%
+	Local rn$
+	Local r.Rooms
+	Local hazard%
+	Local hazardDist#
+	Local pitX#
+	Local pitZ#
+	
+	dist = Distance(EntityX(n\Collider), EntityZ(n\Collider), n\EnemyX, n\EnemyZ)
+	If dist < finalDist Then Return True
+	
+	If D9341StartPlayerBypass(n) Then Return False
+	
+	If D9341MaybeStartTeslaReaction(n) Then Return False
+	
+	If n\PathStatus <> 1 Then
+		n\PathStatus = FindPath(n, n\EnemyX, n\EnemyY + 0.1, n\EnemyZ)
+		n\PathTimer = 0
+		n\PathLocation = 0
+		n\PathX = 0
+		n\PathZ = 0
+	EndIf
+	
+	If n\PathStatus = 1 Then
+		While n\PathLocation <= 19
+			If n\Path[n\PathLocation] = Null Then
+				n\PathLocation = n\PathLocation + 1
+			Else
+				Exit
+			EndIf
+		Wend
+		
+		If n\PathLocation > 19 Then
+			directMode = True
+		Else
+			wpX = EntityX(n\Path[n\PathLocation]\obj, True)
+			wpY = EntityY(n\Path[n\PathLocation]\obj, True)
+			wpZ = EntityZ(n\Path[n\PathLocation]\obj, True)
+			If n\Path[n\PathLocation]\room <> Null Then
+				If n\Path[n\PathLocation]\room\RoomTemplate <> Null Then
+					rn = Lower(n\Path[n\PathLocation]\room\RoomTemplate\Name)
+					If Instr(rn, "pit") > 0 Then
+						pitX = EntityX(n\Path[n\PathLocation]\room\obj, True)
+						pitZ = EntityZ(n\Path[n\PathLocation]\room\obj, True)
+						If Distance(EntityX(n\Collider), EntityZ(n\Collider), pitX, pitZ) < 2.35 Then
+							If Abs(EntityX(n\Collider) - pitX) > Abs(EntityZ(n\Collider) - pitZ) Then
+								If EntityX(n\Collider) < pitX Then wpX = Min(wpX, pitX - 1.05) Else wpX = Max(wpX, pitX + 1.05)
+							Else
+								If EntityZ(n\Collider) < pitZ Then wpZ = Min(wpZ, pitZ - 1.05) Else wpZ = Max(wpZ, pitZ + 1.05)
+							EndIf
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+			pathDoor = n\Path[n\PathLocation]\door
+			If n\PathLocation > 0 Then
+				If n\Path[n\PathLocation - 1] <> Null Then d = n\Path[n\PathLocation - 1]\door
+			EndIf
+			If pathDoor = Null Then pathDoor = d
+			If pathDoor <> Null Then
+				If n\LastDoor <> pathDoor Then
+					n\LastDoor = pathDoor
+					n\DoorRetry = 0
+					n\DoorWaitTimer = 0
+				EndIf
+				If pathDoor\frameobj <> 0 Then
+					doorDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), EntityX(pathDoor\frameobj, True), EntityZ(pathDoor\frameobj, True))
+				Else
+					doorDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+				EndIf
+				keyDoor = D9341DoorKeycard(pathDoor)
+				button = D9341DoorButton(n, pathDoor)
+				If button <> 0 Then buttonDist = EntityDistance(n\Collider, button) Else buttonDist = 1000.0
+				If keyDoor And pathDoor\locked And D9341LCZCheckpointLocked() Then
+					If D9341RouteToLockdownSwitch(n) Then Return False
+				EndIf
+				If keyDoor And pathDoor\open = False And button <> 0 Then
+					wpX = EntityX(button, True)
+					wpY = EntityY(button, True)
+					wpZ = EntityZ(button, True)
+					If buttonDist < 0.90 Then
+						D9341TurnTowardPoint(n, EntityX(button, True), EntityZ(button, True), 5.0)
+						n\CurrSpeed = CurveValue(0, n\CurrSpeed, 8.0)
+						If D9341DoorUsable(n, pathDoor) Then
+							If n\Angle < 1 Then
+								n\Angle = 1
+								n\State2 = 0
+							EndIf
+							n\State2 = n\State2 + FPSfactor
+							If n\State2 > 70 * 0.85 Then
+								D9341OpenDoorNow(n, pathDoor)
+								n\Angle = 2
+								n\State2 = 0
+							EndIf
+						Else
+							If D9341RouteToLockdownSwitch(n) Then Return False
+							n\PathStatus = 0
+						EndIf
+						Return False
+					EndIf
+				EndIf
+				If doorDist < 0.78 Then
+					If pathDoor\open = False Then
+						If D9341DoorUsable(n, pathDoor) And (keyDoor = False Or button = 0) Then D9341OpenDoorNow(n, pathDoor)
+					EndIf
+					If D9341DoorReady(pathDoor) = False Then doorWait = True
+				EndIf
+				If keyDoor And pathDoor\open And D9341DoorReady(pathDoor) = False Then doorWait = True
+				If D9341DoorReady(pathDoor) Then
+					n\Angle = 0
+					n\State2 = 0
+					n\DoorWaitTimer = 0
+				EndIf
+				If keyDoor And n\DoorRetry >= 2 And D9341DoorReady(pathDoor) Then
+					If pathDoor\LinkedDoor <> Null Then
+						If pathDoor\LinkedDoor\frameobj <> 0 Then
+							wpX = EntityX(pathDoor\LinkedDoor\frameobj, True)
+							wpY = EntityY(pathDoor\LinkedDoor\frameobj, True)
+							wpZ = EntityZ(pathDoor\LinkedDoor\frameobj, True)
+							pathDoor = pathDoor\LinkedDoor
+							doorWait = False
+						EndIf
+					EndIf
+				EndIf
+				If n\DoorRetry = 1 And pathDoor\open = False Then
+					button = D9341DoorButton(n, pathDoor)
+					If button <> 0 Then
+						wpX = EntityX(button, True)
+						wpY = EntityY(button, True)
+						wpZ = EntityZ(button, True)
+						buttonDist = EntityDistance(n\Collider, button)
+						doorWait = False
+						If buttonDist < 0.95 Then
+							D9341TurnTowardPoint(n, EntityX(button, True), EntityZ(button, True), 5.0)
+							PlaySound2(ButtonSFX, Camera, button, 12.0, 0.8)
+							If D9341DoorUsable(n, pathDoor) Then
+								If pathDoor\open = False Then D9341OpenDoorNow(n, pathDoor)
+								pathDoor\dist = 0
+								If pathDoor\fastopen < 1 Then pathDoor\fastopen = 1
+								If pathDoor\LinkedDoor <> Null Then
+									pathDoor\LinkedDoor\dist = 0
+									If pathDoor\LinkedDoor\fastopen < 1 Then pathDoor\LinkedDoor\fastopen = 1
+								EndIf
+							EndIf
+							n\DoorRetry = 2
+							n\DoorWaitTimer = 0
+							Return False
+						EndIf
+					Else
+						n\DoorRetry = 2
+						n\DoorWaitTimer = 0
+					EndIf
+				ElseIf pathDoor\open Then
+					n\DoorRetry = 0
+					n\DoorWaitTimer = 0
+				EndIf
+				If doorWait Then
+					n\DoorWaitTimer = n\DoorWaitTimer + FPSfactor
+					If n\DoorRetry = 0 And n\DoorWaitTimer > 70 * 5.0 Then
+						If keyDoor And D9341RouteToLockdownSwitch(n) Then Return False
+						n\DoorRetry = 1
+						n\DoorWaitTimer = 0
+					ElseIf n\DoorRetry >= 2 And n\DoorWaitTimer > 70 * 5.0 Then
+						If keyDoor And D9341RouteToLockdownSwitch(n) Then Return False
+						If keyDoor And pathDoor\LinkedDoor <> Null Then
+							n\DoorRetry = 1
+							n\DoorWaitTimer = 0
+							n\State3 = 0
+							Return False
+						EndIf
+						n\PathStatus = 0
+						n\PathTimer = 0
+						n\PathLocation = 0
+						n\PathX = 0
+						n\PathZ = 0
+						n\DoorRetry = 0
+						n\DoorWaitTimer = 0
+						n\LastDoor = Null
+						Return False
+					EndIf
+				ElseIf n\DoorRetry = 0 Then
+					n\DoorWaitTimer = 0
+				EndIf
+			Else
+				n\LastDoor = Null
+				n\DoorRetry = 0
+				n\DoorWaitTimer = 0
+			EndIf
+		EndIf
+	Else
+		If D9341DirectTargetVisible(n, n\EnemyX, n\EnemyY + 0.25, n\EnemyZ) Or dist < 2.25 Then
+			directMode = True
+		Else
+			n\CurrSpeed = CurveValue(0, n\CurrSpeed, 8.0)
+			n\State3 = n\State3 + FPSfactor
+			If n\State3 > 70 * 3.5 Then
+				n\PathStatus = 0
+				n\PathTimer = 0
+				n\PathLocation = 0
+				n\State3 = 0
+			EndIf
+			Return False
+		EndIf
+	EndIf
+	
+	If directMode Then
+		wpX = n\EnemyX
+		wpY = n\EnemyY
+		wpZ = n\EnemyZ
+	EndIf
+	
+	For r.Rooms = Each Rooms
+		If r\RoomTemplate <> Null Then
+			rn = Lower(r\RoomTemplate\Name)
+			If Instr(rn, "pit") > 0 Then
+				hazard = r\obj
+				If r\Objects[7] <> 0 Then hazard = r\Objects[7]
+				If hazard <> 0 Then
+					pitX = EntityX(hazard, True)
+					pitZ = EntityZ(hazard, True)
+					hazardDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), pitX, pitZ)
+					If hazardDist < 2.25 Or Distance(wpX, wpZ, pitX, pitZ) < 1.35 Then
+						If Abs(EntityX(n\Collider) - pitX) > Abs(EntityZ(n\Collider) - pitZ) Then
+							If EntityX(n\Collider) < pitX Then wpX = Min(wpX, pitX - 1.65) Else wpX = Max(wpX, pitX + 1.65)
+						Else
+							If EntityZ(n\Collider) < pitZ Then wpZ = Min(wpZ, pitZ - 1.65) Else wpZ = Max(wpZ, pitZ + 1.65)
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	prevDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+	
+	If n\SoundTimer > 0 Then
+		n\SoundTimer = Max(n\SoundTimer - FPSfactor, 0)
+		sprinting = True
+	Else
+		If n\IdleTimer <= 0 Then n\IdleTimer = 70 * Rnd(1.8, 4.4)
+		n\IdleTimer = Max(n\IdleTimer - FPSfactor, 0)
+		If n\IdleTimer <= 0 And dist > 6.5 And doorWait = False Then
+			If Rand(1, 3) = 1 Or dist > 12.0 Then
+				n\SoundTimer = 70 * Rnd(1.45, 2.75)
+				n\IdleTimer = 70 * Rnd(2.4, 5.6)
+				sprinting = True
+			EndIf
+		EndIf
+	EndIf
+	
+	blocked = D9341AvoidBlockingNPC(n, 0.82)
+	If doorWait Then
+		targetSpeed = 0
+	ElseIf blocked Then
+		targetSpeed = 0.006
+	ElseIf sprinting Then
+		targetSpeed = 0.037
+	Else
+		targetSpeed = 0.021
+	EndIf
+	
+	targetPvt = CreatePivot()
+	lookPvt = CreatePivot()
+	PositionEntity targetPvt, wpX, EntityY(n\Collider, True), wpZ, True
+	PositionEntity lookPvt, EntityX(n\Collider, True), EntityY(n\Collider, True), EntityZ(n\Collider, True), True
+	PointEntity lookPvt, targetPvt
+	turnDelta = Abs(angleDist(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True)))
+	RotateEntity n\Collider, 0, CurveAngle(EntityYaw(lookPvt, True), EntityYaw(n\Collider, True), 7.0), 0, True
+	FreeEntity lookPvt
+	FreeEntity targetPvt
+	
+	If turnDelta > 70 Then targetSpeed = targetSpeed * 0.68
+	If turnDelta > 110 Then targetSpeed = targetSpeed * 0.50
+	If D9341SteerAroundWall(n, wpX, wpZ) Then
+		targetSpeed = Min(targetSpeed, 0.017)
+		n\State3 = Max(n\State3, 70 * 1.5)
+	EndIf
+	
+	n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 12.0)
+	MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+	newDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), wpX, wpZ)
+	movedDist = Distance(EntityX(n\Collider, True), EntityZ(n\Collider, True), n\PrevX, n\PrevZ)
+	
+	If doorWait Or blocked Then
+		n\State3 = 0
+		n\PathTimer = 0
+		n\PrevX = EntityX(n\Collider, True)
+		n\PrevZ = EntityZ(n\Collider, True)
+	ElseIf targetSpeed > 0 Then
+		If Abs(n\PathX - wpX) > 0.01 Or Abs(n\PathZ - wpZ) > 0.01 Then
+			n\PathX = wpX
+			n\PathZ = wpZ
+			n\PathTimer = prevDist
+			n\State3 = 0
+		EndIf
+		If n\PathTimer <= 0 Then n\PathTimer = prevDist
+		If newDist < n\PathTimer - (0.010 * FPSfactor) Then
+			n\State3 = 0
+		ElseIf movedDist < 0.0035 * FPSfactor Then
+			n\State3 = n\State3 + FPSfactor
+		ElseIf newDist + 0.02 >= n\PathTimer Then
+			n\State3 = n\State3 + FPSfactor
+		Else
+			n\State3 = 0
+		EndIf
+		n\PathTimer = newDist
+		n\PrevX = EntityX(n\Collider, True)
+		n\PrevZ = EntityZ(n\Collider, True)
+		If ((pathDoor <> Null And n\State3 > 70 * 2.7) Or (pathDoor = Null And n\State3 > 70 * 2.1)) Then
+			If pathDoor <> Null Then
+				If movedDist < 0.0035 * FPSfactor And n\CurrSpeed > 0.004 Then
+					If D9341LiftNudgeToward(n, wpX, wpZ) Then
+						n\State3 = 0
+						n\PathTimer = 0
+						Return False
+					EndIf
+				EndIf
+				If n\DoorRetry = 0 Then
+					n\DoorRetry = 1
+					n\DoorWaitTimer = 0
+					n\State3 = 0
+					Return False
+				EndIf
+				n\PathStatus = 0
+				n\PathTimer = 0
+				n\PathLocation = 0
+				n\State3 = 0
+				n\PathX = 0
+				n\PathZ = 0
+				n\DoorRetry = 0
+				n\DoorWaitTimer = 0
+				n\LastDoor = Null
+				Return False
+			EndIf
+			If movedDist < 0.0035 * FPSfactor And n\CurrSpeed > 0.004 Then
+				If D9341LiftNudgeToward(n, wpX, wpZ) Then
+					n\State3 = 0
+					n\PathTimer = 0
+				Else
+					D9341StartStuckWander(n)
+				EndIf
+			Else
+				n\PathStatus = 0
+				n\PathTimer = 0
+				n\PathLocation = 0
+				n\State3 = 0
+				n\PathX = 0
+				n\PathZ = 0
+			EndIf
+		EndIf
+	EndIf
+	
+	If doorWait = False And blocked = False Then
+		If n\PathStatus = 1 Then
+				If (newDist < 0.30) Or ((prevDist < newDist) And (prevDist < 0.60)) Then
+					n\PathLocation = n\PathLocation + 1
+					D9341StartCloseBehind(n, pathDoor, wpX, wpZ)
+					n\PathTimer = 0
+					n\State3 = 0
+					n\PathX = 0
+					n\PathZ = 0
+			EndIf
+		EndIf
+	EndIf
+	
+	Return False
+End Function
+
+
+Function D9341HandleInteraction(n.NPCs)
+	Local it.Items
+	Local r.Rooms
+	Local e.Events
+	Local spawnX#
+	Local spawnY#
+	Local spawnZ#
+	Local opensfx914%
+	Local closesfx914%
+	Local outputDist#
+	Local pvt%
+	
+	Select Int(n\PrevState)
+		Case 10
+			it = D9341FindNearestItem(n, "key1")
+			If it <> Null Then
+				If EntityDistance(n\Collider, it\collider) < 1.45 Then
+					RemoveItem(it)
+					D9341AddFlag(n, D9341F_KEY1)
+					D9341ChooseNextObjective(n)
+				Else
+					D9341SetItemTarget(n, it)
+				EndIf
+			Else
+				D9341AddFlag(n, D9341F_KEY1)
+				D9341ChooseNextObjective(n)
+			EndIf
+		Case 20
+			it = D9341FindNearestItem(n, "key2")
+			If it <> Null Then
+				If EntityDistance(n\Collider, it\collider) < 1.45 Then
+					RemoveItem(it)
+					D9341AddFlag(n, D9341F_KEY1)
+					D9341AddFlag(n, D9341F_KEY2)
+					D9341AddFlag(n, D9341F_TESTROOMCLOSE)
+					D9341ChooseNextObjective(n)
+				Else
+					D9341SetItemTarget(n, it)
+				EndIf
+			Else
+				D9341AddFlag(n, D9341F_KEY2)
+				D9341ChooseNextObjective(n)
+			EndIf
+		Case 25
+			n\State2 = n\State2 + FPSfactor
+			If n\State2 > 70 * 1.5 Then
+				r = D9341FindNearestRoom(n, "room2shaft")
+				If r <> Null Then
+					PositionEntity n\Collider, EntityX(r\obj, True), EntityY(r\obj, True) + 0.2, EntityZ(r\obj, True), True
+					ResetEntity n\Collider
+				EndIf
+				D9341AddFlag(n, D9341F_LOCKDOWN)
+				D9341AddFlag(n, D9341F_KEY1)
+				D9341AddFlag(n, D9341F_KEY2)
+				D9341AddFlag(n, D9341F_OMNI)
+				D9341ChooseNextObjective(n)
+			EndIf
+		Case 30
+			r = D9341FindNearestRoom(n, "914")
+			If r = Null Then
+				D9341AddFlag(n, D9341F_OMNI)
+				D9341ChooseNextObjective(n)
+			Else
+				If D9341HasFlag(n, D9341F_914DROP) = False Then
+					If r\RoomDoors[0] <> Null Then D9341OpenDoorNow(n, r\RoomDoors[0])
+					If r\Objects[2] <> 0 Then
+						If EntityDistance(n\Collider, r\Objects[2]) > 0.95 Then
+							If D9341SetRoomTarget(n, r, 2) Then n\PrevState = 30
+							Return
+						EndIf
+						D9341Remove914InputKey2(r)
+						it = CreateItem("key2", EntityX(r\Objects[2], True), EntityY(r\Objects[2], True) + 0.1, EntityZ(r\Objects[2], True))
+						EntityType(it\collider, HIT_ITEM)
+						D9341RemoveFlag(n, D9341F_KEY2)
+						D9341AddFlag(n, D9341F_914DROP)
+						n\State3 = 0
+					Else
+						D9341AddFlag(n, D9341F_914DROP)
+					EndIf
+					Return
+				EndIf
+				If D9341HasFlag(n, D9341F_914APPROACH) = False Then
+					If EntityDistance(n\Collider, r\obj) > 1.35 Then
+						D9341SetTarget(n, EntityX(r\obj, True), EntityY(r\obj, True), EntityZ(r\obj, True))
+						n\PrevState = 30
+						Return
+					EndIf
+					D9341AddFlag(n, D9341F_914APPROACH)
+					Return
+				EndIf
+				If D9341HasFlag(n, D9341F_914STARTED) = False Then
+					If r\Objects[1] <> 0 Then
+						If EntityDistance(n\Collider, r\Objects[1]) > 1.25 Then
+							If D9341SetRoomTarget(n, r, 1) Then n\PrevState = 30
+							Return
+						EndIf
+						D9341TurnTowardPoint(n, EntityX(r\Objects[1], True), EntityZ(r\Objects[1], True), 6.0)
+						RotateEntity r\Objects[1], EntityPitch(r\Objects[1]), EntityYaw(r\Objects[1]), -40
+						PlaySound2(ButtonSFX, Camera, r\Objects[1], 12.0, 1.0)
+					EndIf
+					For e.Events = Each Events
+						If e\EventName = "914" And e\room = r Then
+							If e\EventState <= 0 Then e\EventState = 1
+							If e\SoundCHN = 0 Then e\SoundCHN = PlaySound2(MachineSFX, Camera, r\Objects[1], 12.0, 1.0)
+						EndIf
+					Next
+					closesfx914 = LoadTempSound("SFX\SCP\914\DoorClose.ogg")
+					If r\RoomDoors[0] <> Null Then r\RoomDoors[0]\open = False : r\RoomDoors[0]\SoundCHN = PlaySound2(closesfx914, Camera, r\RoomDoors[0]\obj, 12.0, 1.0)
+					If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\open = False : r\RoomDoors[1]\SoundCHN = PlaySound2(closesfx914, Camera, r\RoomDoors[1]\obj, 12.0, 1.0)
+					If r\Objects[0] <> 0 Then RotateEntity r\Objects[0], EntityPitch(r\Objects[0]), EntityYaw(r\Objects[0]), 180
+					D9341Remove914InputKey2(r)
+					D9341AddFlag(n, D9341F_914STARTED)
+					n\State3 = 0
+					n\PrevY = 0
+					Return
+				EndIf
+				If D9341HasFlag(n, D9341F_914OUTPUT) = False Then
+					If r\Objects[3] <> 0 Then
+						If n\PrevY < 70 * 8.5 Then
+							outputDist = EntityDistance(n\Collider, r\Objects[3])
+							If outputDist < 1.05 Or outputDist > 2.45 Then
+								If D9341Set914OutputWaitTarget(n, r) Then n\PrevState = 30
+								Return
+							EndIf
+							n\CurrSpeed = CurveValue(0, n\CurrSpeed, 8.0)
+							If NoTarget Then
+								If n\State3 <= 0 Then
+									n\Angle = WrapAngle(EntityYaw(n\Collider, True) + Rnd(-85.0, 85.0))
+									n\State3 = 70 * Rnd(0.9, 2.4)
+								EndIf
+								RotateEntity n\Collider, 0, CurveAngle(n\Angle, EntityYaw(n\Collider, True), 85.0), 0, True
+								n\State3 = Max(n\State3 - FPSfactor, 0)
+							Else
+								If EntityDistance(n\Collider, Collider) < 8.0 Then TurnConsoleNPCToPlayer(n, 9.0)
+							EndIf
+							Return
+						EndIf
+					EndIf
+					If n\PrevY > 70 * 8.5 Then
+						D9341Remove914InputKey2(r)
+						If D9341HasFlag(n, D9341F_914OMNISPAWN) = False Then
+							D9341Remove914OutputOmni(r)
+							If r\Objects[3] <> 0 Then
+								spawnX = EntityX(r\Objects[3], True)
+								spawnY = EntityY(r\Objects[3], True) + 0.1
+								spawnZ = EntityZ(r\Objects[3], True)
+							Else
+								spawnX = EntityX(r\obj, True)
+								spawnY = EntityY(r\obj, True) + 0.3
+								spawnZ = EntityZ(r\obj, True)
+							EndIf
+							If r\RoomDoors[1] <> Null Then
+								If r\RoomDoors[1]\frameobj <> 0 Then
+									pvt = CreatePivot()
+									PositionEntity pvt, EntityX(r\RoomDoors[1]\frameobj, True), EntityY(r\obj, True), EntityZ(r\RoomDoors[1]\frameobj, True), True
+									RotateEntity pvt, 0, EntityYaw(r\RoomDoors[1]\frameobj, True), 0, True
+									MoveEntity pvt, 0.34, 0, 0.68
+									spawnX = EntityX(pvt, True)
+									spawnY = EntityY(pvt, True) + 0.1
+									spawnZ = EntityZ(pvt, True)
+									FreeEntity pvt
+								EndIf
+							EndIf
+							it = CreateItem("key6", spawnX, spawnY, spawnZ)
+							EntityType(it\collider, HIT_ITEM)
+							D9341AddFlag(n, D9341F_914OMNISPAWN)
+						EndIf
+						D9341AddFlag(n, D9341F_914OUTPUT)
+						opensfx914 = LoadTempSound("SFX\SCP\914\DoorOpen.ogg")
+						If r\RoomDoors[0] <> Null Then r\RoomDoors[0]\open = True : r\RoomDoors[0]\SoundCHN = PlaySound2(opensfx914, Camera, r\RoomDoors[0]\obj, 12.0, 1.0)
+						If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\open = True : r\RoomDoors[1]\SoundCHN = PlaySound2(opensfx914, Camera, r\RoomDoors[1]\obj, 12.0, 1.0)
+						If r\Objects[0] <> 0 Then RotateEntity r\Objects[0], EntityPitch(r\Objects[0]), EntityYaw(r\Objects[0]), 0
+						For e.Events = Each Events
+							If e\EventName = "914" And e\room = r Then e\EventState = 0
+						Next
+						n\PrevState = 31
+						n\State3 = 0
+						n\Angle = 0
+						If it <> Null Then D9341SetItemTarget(n, it)
+					EndIf
+				EndIf
+			EndIf
+		Case 31
+			it = D9341FindNearestItem(n, "key6")
+			If it <> Null Then
+				If EntityDistance(n\Collider, it\collider) < 1.05 Then
+					n\CurrSpeed = CurveValue(0, n\CurrSpeed, 8.0)
+					n\State3 = n\State3 + FPSfactor
+					If n\State3 > 70 * 0.75 Then
+						RemoveItem(it)
+						D9341AddFlag(n, D9341F_OMNI)
+						D9341ChooseNextObjective(n)
+					EndIf
+				Else
+					n\State3 = 0
+					D9341SetItemTarget(n, it)
+				EndIf
+			Else
+				D9341AddFlag(n, D9341F_OMNI)
+				D9341ChooseNextObjective(n)
+			EndIf
+		Case 40
+			For e.Events = Each Events
+				If e\EventName = "room2sl" Then
+					If e\room <> Null Then
+						If e\room\Levers[0] <> 0 Then
+							If EntityDistance(n\Collider, e\room\Levers[0]) > 2.25 Then
+								If D9341SetRoom2SLTarget(n, e\room) Then
+									n\PrevState = 40
+									Return
+								EndIf
+							EndIf
+							If Distance(EntityX(n\Collider), EntityZ(n\Collider), EntityX(e\room\Levers[0], True), EntityZ(e\room\Levers[0], True)) > 0.95 Then
+								D9341SetTarget(n, EntityX(e\room\Levers[0], True), EntityY(e\room\Levers[0], True), EntityZ(e\room\Levers[0], True))
+								n\PrevState = 40
+								Return
+							EndIf
+							D9341TurnTowardPoint(n, EntityX(e\room\Levers[0], True), EntityZ(e\room\Levers[0], True), 6.0)
+							PlaySound2(ButtonSFX, Camera, e\room\Levers[0], 8.0, 0.6)
+							RotateEntity e\room\Levers[0], -80, EntityYaw(e\room\Levers[0]), 0
+						EndIf
+					EndIf
+					e\EventState3 = 0
+				EndIf
+			Next
+			TurnCheckpointMonitorsOff(0)
+			D9341AddFlag(n, D9341F_LOCKDOWN)
+			D9341ChooseNextObjective(n)
+		Case 50
+			For e.Events = Each Events
+				If e\EventName = "008" Then
+					e\EventState = 2
+					If e\room <> Null Then
+						If e\room\RoomDoors[0] <> Null Then e\room\RoomDoors[0]\locked = False : e\room\RoomDoors[0]\open = True
+						If e\room\RoomDoors[1] <> Null Then e\room\RoomDoors[1]\locked = False : e\room\RoomDoors[1]\open = True
+						If e\room\Levers[0] <> 0 Then
+							If EntityDistance(n\Collider, e\room\Levers[0]) > 1.0 Then
+								D9341SetTarget(n, EntityX(e\room\Levers[0], True), EntityY(e\room\Levers[0], True), EntityZ(e\room\Levers[0], True))
+								n\PrevState = 50
+								Return
+							EndIf
+							PlaySound2(ButtonSFX, Camera, e\room\Levers[0], 8.0, 0.6) : RotateEntity e\room\Levers[0], 35, EntityYaw(e\room\Levers[0]), 0
+						EndIf
+					EndIf
+				EndIf
+			Next
+			D9341AddFlag(n, D9341F_008)
+			D9341ChooseNextObjective(n)
+		Case 60
+			RemoteDoorOn = False
+			For r.Rooms = Each Rooms
+				If r\RoomTemplate <> Null Then
+					If Lower(r\RoomTemplate\Name) = "room2ccont" Then
+						If r\Objects[5] <> 0 Then PlaySound2(ButtonSFX, Camera, r\Objects[5], 12.0, 1.0) : RotateEntity r\Objects[5], -80, EntityYaw(r\Objects[5]), 0
+					EndIf
+				EndIf
+			Next
+			n\LastDist = 70 * 1.2
+			D9341AddFlag(n, D9341F_RCCOFF)
+			D9341ChooseNextObjective(n)
+			D9341StartStuckWander(n)
+		Case 70
+			If n\State2 = 0 Then
+				For e.Events = Each Events
+					If e\EventName = "room079" Then
+						e\EventState = 3
+						e\EventState2 = 1
+						If e\SoundCHN <> 0 Then
+							StopStream_Strict(e\SoundCHN)
+							e\SoundCHN = 0
+							e\SoundCHN_isStream = False
+						EndIf
+						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Speech.ogg", SFXVolume, 0)
+						e\SoundCHN_isStream = True
+					EndIf
+				Next
+				n\State2 = 1
+			Else
+				n\State2 = n\State2 + FPSfactor
+				If n\State2 > 70 * 14 Then
+					D9341AddFlag(n, D9341F_079)
+					D9341ChooseNextObjective(n)
+				EndIf
+			EndIf
+		Case 80
+			RemoteDoorOn = True
+			For r.Rooms = Each Rooms
+				If r\RoomTemplate <> Null Then
+					If Lower(r\RoomTemplate\Name) = "room2ccont" Then
+						If r\Objects[5] <> 0 Then PlaySound2(ButtonSFX, Camera, r\Objects[5], 12.0, 1.0) : RotateEntity r\Objects[5], 80, EntityYaw(r\Objects[5]), 0
+					EndIf
+				EndIf
+			Next
+			n\LastDist = 70 * 1.2
+			D9341AddFlag(n, D9341F_RCCON)
+			D9341ChooseNextObjective(n)
+			D9341StartStuckWander(n)
+		Case 90
+			r = D9341NearestRoomByName(n, "gateaentrance")
+			If r <> Null Then
+				If EntityDistance(n\Collider, r\obj) < 8.0 Then
+					If r\RoomDoors[0] <> Null Then r\RoomDoors[0]\locked = False : r\RoomDoors[0]\open = True
+					If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\locked = False : r\RoomDoors[1]\open = True
+					For r.Rooms = Each Rooms
+						If r\RoomTemplate <> Null Then
+							If Lower(r\RoomTemplate\Name) = "gatea" Then
+								If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\locked = False : r\RoomDoors[1]\open = True
+								If r\Objects[1] <> 0 Then
+									PositionEntity n\Collider, EntityX(r\Objects[1], True), EntityY(r\Objects[1], True), EntityZ(r\Objects[1], True), True
+									ResetEntity n\Collider
+								EndIf
+								D9341SetRoomTarget(n, r, 4)
+								n\PrevState = 90
+								Return
+							EndIf
+						EndIf
+					Next
+				EndIf
+			EndIf
+			r = D9341NearestRoomByName(n, "gatea")
+			If r <> Null Then
+				If EntityDistance(n\Collider, r\obj) < 18.0 Then
+					If r\Objects[4] <> 0 Then
+						If EntityDistance(n\Collider, r\Objects[4]) > 1.2 Then
+							D9341SetRoomTarget(n, r, 4)
+							n\PrevState = 90
+							Return
+						EndIf
+					EndIf
+				EndIf
+			EndIf
+			D9341AddFlag(n, D9341F_GATEB)
+			n\State = 0
+			n\CurrSpeed = 0
+		Default
+			D9341ChooseNextObjective(n)
+	End Select
+End Function
+
+Function D9341StartMirrorReaction%(n.NPCs)
+	If NoTarget Then Return False
+	If n\LastSeen > 0 Then Return False
+	If n\State >= 130 Then Return False
+	If n\State < 100 Then Return False
+	If ConsoleNPCPlayerVisible(n, 4.8) = False Then Return False
+	
+	n\Idle = n\State
+	n\State = 130
+	n\State2 = 0
+	n\State3 = 0
+	n\SoundTimer = 0
+	n\Angle = 0
+	n\CurrSpeed = 0
+	Return True
+End Function
+
+Function UpdateD9341BodyNPC(n.NPCs)
+	RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
+	
+	Select n\State
+		Case 0
+			n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 212, 235, 0.10)
+		Case 1
+			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 236, 260, n\CurrSpeed * 15.0)
+		Case 2
+			n\CurrSpeed = CurveValue(0.030, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 301, 319, n\CurrSpeed * 15.0)
+		Case 3
+			n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 357, 381, 0.08)
+		Case 4
+			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 382, 406, n\CurrSpeed * 15.0)
+		Case 5
+			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 281, 300, n\CurrSpeed * 16.0)
+		Case 6
+			n\CurrSpeed = CurveValue(0.020, n\CurrSpeed, 5.0)
+			Animate2(n\obj, AnimTime(n\obj), 261, 280, n\CurrSpeed * 16.0)
+		Case 7
+			n\CurrSpeed = CurveValue(-0.012, n\CurrSpeed, 5.0)
+			AnimateNPC(n, 260, 236, n\CurrSpeed * 25)
+		Case 8
+			n\CurrSpeed = CurveValue(-0.010, n\CurrSpeed, 5.0)
+			AnimateNPC(n, 406, 382, n\CurrSpeed * 26)
+		Case 9
+			n\CurrSpeed = CurveValue(-0.018, n\CurrSpeed, 5.0)
+			AnimateNPC(n, 319, 301, n\CurrSpeed * 26)
+	End Select
+End Function
+
+Function UpdateD9341GameNPC(n.NPCs)
+	Local prevFrame#
+	Local dist#
+	Local targetSpeed#
+	Local teslaRoom.Rooms
+	Local button%
+	Local buttonDist#
+	Local sideStep#
+	Local lever%
+	Local r.Rooms
+	
+	RotateEntity(n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider), True)
+	prevFrame = AnimTime(n\obj)
+	If n\LastSeen > 0 Then
+		If NoTarget Or EntityDistance(n\Collider, Collider) > 14.0 Or ConsoleNPCPlayerVisible(n, 14.0) = False Then
+			n\LastSeen = Max(n\LastSeen - FPSfactor, 0)
+		EndIf
+	EndIf
+	If n\LastDist > 0 Then n\LastDist = Max(n\LastDist - FPSfactor, 0)
+	If n\BlinkTimer > 0 Then n\BlinkTimer = Max(n\BlinkTimer - FPSfactor, 0)
+	If Int(n\PrevState) = 30 Then
+		If D9341HasFlag(n, D9341F_914STARTED) Then
+			If D9341HasFlag(n, D9341F_914OUTPUT) = False Then n\PrevY = n\PrevY + FPSfactor
+		EndIf
+	EndIf
+	D9341CloseTestroomAfterLeaving(n)
+	D9341UpdateIdleWatchdog(n)
+	If NoTarget And n\State >= 130 And n\State <= 132 Then
+		n\State = n\Idle
+		If n\State < 100 Then n\State = 101
+		n\State2 = 0
+		n\State3 = 0
+		n\CurrSpeed = 0
+	EndIf
+	
+	If D9341StartMirrorReaction(n) = False Then
+		Select n\State
+			Case 0
+				n\CurrSpeed = CurveValue(0, n\CurrSpeed, 5.0)
+			Case 100
+				n\State2 = 0
+				n\State3 = 0
+				n\PrevState = 0
+				n\Angle = 0
+				D9341ChooseNextObjective(n)
+			Case 101
+				If D9341MaybeStartServerRoom(n) Then
+					; Server-room interaction takes over until its switches are set.
+				ElseIf D9341FollowTarget(n, 0.85) Then
+					n\State = 102
+					n\State2 = 0
+					n\State3 = 0
+					n\Angle = 0
+					n\PathStatus = 0
+					n\PathLocation = 0
+				EndIf
+			Case 102
+				n\CurrSpeed = CurveValue(0, n\CurrSpeed, 8.0)
+				D9341HandleInteraction(n)
+			Case 130
+				TurnConsoleNPCToPlayer(n, 7.5)
+				n\CurrSpeed = CurveValue(0, n\CurrSpeed, 7.0)
+				n\State2 = n\State2 + FPSfactor
+				If n\State2 > 70 * Rnd(0.55, 0.9) Then
+					n\State = 131
+					n\State2 = 0
+					n\State3 = 0
+					n\SoundTimer = 0
+					n\Angle = 0
+				EndIf
+			Case 131
+				TurnConsoleNPCToPlayer(n, 5.5)
+				dist = EntityDistance(n\Collider, Collider)
+				If n\SoundTimer <= 0 Then
+					n\State3 = Rand(0, 5)
+					n\SoundTimer = 70 * Rnd(0.22, 0.58)
+					If Rand(1, 5) = 1 Then
+						If n\Angle = 0 Then n\Angle = 1 Else n\Angle = 0
+					EndIf
+				Else
+					n\SoundTimer = Max(n\SoundTimer - FPSfactor, 0)
+				EndIf
+				If dist < 1.0 Then
+					targetSpeed = -Rnd(0.010, 0.018)
+				ElseIf dist > 2.3 Then
+					targetSpeed = Rnd(0.010, 0.020)
+				Else
+					Select Int(n\State3)
+						Case 0
+							targetSpeed = Rnd(0.008, 0.016)
+						Case 1
+							targetSpeed = -Rnd(0.008, 0.016)
+						Case 2
+							targetSpeed = Rnd(0.018, 0.030)
+						Case 3
+							targetSpeed = -Rnd(0.012, 0.022)
+						Default
+							targetSpeed = 0
+					End Select
+				EndIf
+				If n\Angle = 1 Then targetSpeed = targetSpeed * 0.55
+				n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 6.0)
+				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+				n\State2 = n\State2 + FPSfactor
+				If n\State2 > 70 * Rnd(2.1, 3.0) Then
+					n\State = 132
+					n\State2 = 0
+					n\Angle = 0
+				EndIf
+			Case 132
+				TurnConsoleNPCToPlayer(n, 8.0)
+				n\CurrSpeed = CurveValue(-0.014, n\CurrSpeed, 7.0)
+				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+				n\State2 = n\State2 + FPSfactor
+				If n\State2 > 70 * 0.75 Then
+					n\State = n\Idle
+					If n\State < 100 Then n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\LastSeen = 70 * 60
+				EndIf
+			Case 140
+				D9341TurnTowardPoint(n, n\PrevX, n\PrevZ, 5.5)
+				dist = Distance(EntityX(n\Collider), EntityZ(n\Collider), n\PrevX, n\PrevZ)
+				If dist > 1.18 Then
+					targetSpeed = 0.014
+				ElseIf n\State2 < 70 * 0.30 Then
+					targetSpeed = 0
+				ElseIf n\State2 < 70 * 0.50 Then
+					targetSpeed = -0.006
+				ElseIf n\State2 < 70 * 0.82 Then
+					targetSpeed = 0.010
+				Else
+					targetSpeed = 0
+				EndIf
+				n\CurrSpeed = CurveValue(targetSpeed, n\CurrSpeed, 8.0)
+				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+				If dist <= 1.20 Then n\State2 = n\State2 + FPSfactor
+				If (dist < 1.45 And n\State2 > 70 * 0.82) Or n\State2 > 70 * 1.15 Then
+					teslaRoom = D9341NearestTeslaRoom(n, 3.2)
+					D9341TriggerTeslaRoom(teslaRoom)
+					n\State = 141
+					n\State2 = 0
+					n\CurrSpeed = 0
+				EndIf
+			Case 141
+				D9341TurnTowardPoint(n, n\PathX, n\PathZ, 4.0)
+				If n\State2 < 70 * 1.05 Then
+					n\CurrSpeed = CurveValue(0, n\CurrSpeed, 5.0)
+				Else
+					n\CurrSpeed = CurveValue(0.052, n\CurrSpeed, 3.5)
+				EndIf
+				MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+				n\State2 = n\State2 + FPSfactor
+				If Distance(EntityX(n\Collider), EntityZ(n\Collider), n\PathX, n\PathZ) < 0.8 Or n\State2 > 70 * 2.35 Then
+					D9341ResetTeslaRoom(n\TeslaRoom)
+					n\State = n\Idle
+					If n\State < 100 Then n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\LastDist = 70 * 4
+					n\PathStatus = 0
+				EndIf
+			Case 150
+				D9341TurnTowardPoint(n, n\PrevX, n\PrevZ, 8.0)
+				buttonDist = Distance(EntityX(n\Collider), EntityZ(n\Collider), n\PathX, n\PathZ)
+				If n\DoorTarget <> Null Then
+					If n\DoorTarget\frameobj <> 0 Then
+						dist = EntityDistance(n\Collider, n\DoorTarget\frameobj)
+					Else
+						dist = EntityDistance(n\Collider, n\DoorTarget\obj)
+					EndIf
+				Else
+					dist = 0.7
+				EndIf
+				If n\State2 < 70 * 0.38 Or (dist > 0.62 And n\State2 < 70 * 0.95) Then
+					n\CurrSpeed = CurveValue(-0.010, n\CurrSpeed, 4.5)
+					sideStep = 0.0065 * n\State3
+					If n\State2 > 70 * 0.38 Then sideStep = -sideStep * 0.45
+					MoveEntity n\Collider, sideStep * FPSfactor, 0, n\CurrSpeed * FPSfactor
+					AnimateNPC(n, 260, 236, n\CurrSpeed * 18.0)
+				Else
+					If n\DoorTarget <> Null Then
+						button = D9341DoorButton(n, n\DoorTarget)
+						If button <> 0 Then
+							PlaySound2(ButtonSFX, Camera, button, 12.0, 0.75)
+						Else
+							PlaySound2(ButtonSFX, Camera, n\Collider, 12.0, 0.75)
+						EndIf
+						D9341CloseDoorNow(n\DoorTarget)
+					Else
+						PlaySound2(ButtonSFX, Camera, n\Collider, 12.0, 0.75)
+						D9341CloseNearestDoorAt(n, n\PathX, n\PathZ)
+					EndIf
+					n\DoorTarget = Null
+					n\State = n\Idle
+					If n\State < 100 Then n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\CurrSpeed = 0
+				EndIf
+				n\State2 = n\State2 + FPSfactor
+			Case 170
+				r = D9341NearestRoomByName(n, "room2servers")
+				If r = Null Then
+					D9341AddFlag(n, D9341F_SERVERS)
+					D9341SetTarget(n, n\PrevX, n\Angle, n\PrevZ)
+					n\State = 101
+					n\State2 = 0
+				ElseIf n\PrevY < 3 Then
+					lever = r\Levers[Int(n\PrevY)]
+					If lever <> 0 Then
+						If Distance(EntityX(n\Collider), EntityZ(n\Collider), EntityX(lever, True), EntityZ(lever, True)) > 0.78 Then
+							If Abs(n\EnemyX - EntityX(lever, True)) > 0.05 Or Abs(n\EnemyZ - EntityZ(lever, True)) > 0.05 Then
+								D9341SetTarget(n, EntityX(lever, True), EntityY(lever, True), EntityZ(lever, True))
+							EndIf
+							D9341FollowTarget(n, 0.72)
+						Else
+							D9341TurnTowardPoint(n, EntityX(lever, True), EntityZ(lever, True), 6.0)
+							n\CurrSpeed = CurveValue(0, n\CurrSpeed, 7.0)
+							n\State2 = n\State2 + FPSfactor
+							If n\State2 > 70 * 0.38 Then
+								PlaySound2(LeverSFX, Camera, lever, 8.0, 0.7)
+								If Int(n\PrevY) = 0 Then
+									RotateEntity lever, -80, EntityYaw(lever), 0
+								Else
+									RotateEntity lever, 80, EntityYaw(lever), 0
+								EndIf
+								n\PrevY = n\PrevY + 1
+								n\State2 = 0
+								n\PathStatus = 0
+							EndIf
+						EndIf
+					Else
+						n\PrevY = n\PrevY + 1
+					EndIf
+				Else
+					If r\RoomDoors[0] <> Null Then r\RoomDoors[0]\locked = False
+					If r\RoomDoors[1] <> Null Then r\RoomDoors[1]\locked = False
+					D9341AddFlag(n, D9341F_SERVERS)
+					D9341SetTarget(n, n\PrevX, n\Angle, n\PrevZ)
+					n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\PathStatus = 0
+				EndIf
+			Case 180
+				RotateEntity n\Collider, 0, CurveAngle(n\Angle, EntityYaw(n\Collider, True), 6.0), 0, True
+				If D9341ForwardBlocked(n, EntityYaw(n\Collider, True), 0.52) Then
+					n\Angle = WrapAngle(EntityYaw(n\Collider, True) + (72.0 * n\State3))
+					n\State3 = -n\State3
+				EndIf
+				If n\State2 < 70 * 0.28 Then
+					n\CurrSpeed = CurveValue(0, n\CurrSpeed, 5.0)
+				ElseIf n\State2 < 70 * 1.05 Then
+					n\CurrSpeed = CurveValue(0.018, n\CurrSpeed, 7.0)
+					sideStep = 0.007 * n\State3
+					If n\State2 > 70 * 0.68 Then sideStep = -sideStep
+					MoveEntity n\Collider, sideStep * FPSfactor, 0, n\CurrSpeed * FPSfactor
+				Else
+					n\State = n\Idle
+					If n\State < 100 Then n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\CurrSpeed = 0
+					n\PathStatus = 0
+					n\PathTimer = 0
+					n\PathLocation = 0
+					n\PathX = 0
+					n\PathZ = 0
+				EndIf
+				n\State2 = n\State2 + FPSfactor
+			Case 160
+				TurnConsoleNPCToPlayer(n, 5.5)
+				If n\State2 < 70 * 0.24 Then
+					n\CurrSpeed = CurveValue(-0.009, n\CurrSpeed, 5.5)
+					MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+				ElseIf n\State2 < 70 * 0.62 Then
+					n\CurrSpeed = CurveValue(0.006, n\CurrSpeed, 8.0)
+					MoveEntity n\Collider, 0.010 * n\State3 * FPSfactor, 0, 0
+				Else
+					n\State = n\Idle
+					If n\State < 100 Then n\State = 101
+					n\State2 = 0
+					n\State3 = 0
+					n\CurrSpeed = 0
+					n\PathStatus = 0
+					n\PathTimer = 0
+					n\PathLocation = 0
+					n\PathX = 0
+					n\PathZ = 0
+				EndIf
+				n\State2 = n\State2 + FPSfactor
+			Default
+				n\State = 100
+		End Select
+	EndIf
+	
+	If n\State = 150 And n\CurrSpeed < -0.002 Then
+		AnimateNPC(n, 260, 236, n\CurrSpeed * 18.0)
+	ElseIf n\State = 131 And n\Angle = 1 Then
+		If n\CurrSpeed > 0.004 Then
+			Animate2(n\obj, AnimTime(n\obj), 382, 406, Abs(n\CurrSpeed) * 22.0)
+		ElseIf n\CurrSpeed < -0.004 Then
+			AnimateNPC(n, 406, 382, Abs(n\CurrSpeed) * 28.0)
+		Else
+			Animate2(n\obj, AnimTime(n\obj), 357, 381, 0.08)
+		EndIf
+	ElseIf n\CurrSpeed > 0.030 Then
+		Animate2(n\obj, AnimTime(n\obj), 301, 319, Abs(n\CurrSpeed) * 18.0)
+		If prevFrame < 306 And AnimTime(n\obj) => 306 Then
+			PlaySound2(StepSFX(GetStepSound(n\Collider), 0, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.35, 0.55))
+		ElseIf prevFrame < 315 And AnimTime(n\obj) => 315 Then
+			PlaySound2(StepSFX(GetStepSound(n\Collider), 0, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.35, 0.55))
+		EndIf
+	ElseIf n\CurrSpeed > 0.004 Then
+		Animate2(n\obj, AnimTime(n\obj), 236, 260, Abs(n\CurrSpeed) * 22.0)
+		If prevFrame < 244 And AnimTime(n\obj) => 244 Then
+			PlaySound2(StepSFX(GetStepSound(n\Collider), 0, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.3, 0.5))
+		ElseIf prevFrame < 256 And AnimTime(n\obj) => 256 Then
+			PlaySound2(StepSFX(GetStepSound(n\Collider), 0, Rand(0, 2)), Camera, n\Collider, 8.0, Rnd(0.3, 0.5))
+		EndIf
+	ElseIf n\CurrSpeed < -0.004 Then
+		AnimateNPC(n, 260, 236, n\CurrSpeed * 18.0)
+	Else
+		Animate2(n\obj, AnimTime(n\obj), 212, 235, 0.10)
 	EndIf
 	
 	PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
@@ -8491,7 +10942,15 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			consoleMSG = "Nazi Officer spawned."
 
 		Case "d9341", "d-9341", "benjamin walker", "benjamin oliver walker", "benjamin"
-			n.NPCs = CreateNPC(NPCtypeD9341, EntityX(Collider), EntityY(Collider), EntityZ(Collider) + 0.2)
+			n.NPCs = CreateNPC(NPCtypeD9341, EntityX(Collider), EntityY(Collider) + 0.65, EntityZ(Collider) + 0.2)
+			n\State = 100
+			n\State2 = 0
+			n\State3 = 0
+			n\PrevState = 0
+			n\Reload = 0
+			n\IdleTimer = 70 * Rnd(3.0, 6.0)
+			n\SoundTimer = 0
+			ResetEntity n\Collider
 			consoleMSG = "Subject D-9341 spawned."
 			
 		Case "guard"

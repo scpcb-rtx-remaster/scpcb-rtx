@@ -6477,27 +6477,19 @@ Function UpdateEvents()
 								;Animate2(e\room\Objects[3], AnimTime(e\room\Objects[3]), 0, 8, 0.1, False)
 								;Animate2(e\room\Objects[4], AnimTime(e\room\Objects[4]), 0, 8, 0.1, False)
 								
+								If EntityY(Collider)<6.0 Then
+									ShowEntity dp\portal
+								Else
+									HideEntity dp\portal
+								EndIf
+
 								If EntityInView(dp\portal,Camera) And EntityY(Collider)<6.0 Then
 	
 	                                dp\camyaw   = EntityYaw(Camera,True)
 	                                dp\campitch = EntityPitch(Camera,True)
                                  	dp\camroll  = EntityRoll(Camera,True)
-                                	Local distToPortal#
-Local nearDist# = 0.5
-Local farDist# = 6.0
-;Local t#
-Local zoomNear# = 0.78
-Local zoomFar# = 1.0
 
-distToPortal = EntityDistance(Camera, dp\portal)
-
-t = (distToPortal - nearDist) / (farDist - nearDist)
-If t < 0.0 Then t = 0.0
-If t > 1.0 Then t = 1.0
-
-dp\camZoom = zoomNear + ((zoomFar - zoomNear) * t)
-dp\camZoom = dp\camZoom + (CurrCameraZoom / 400.0)
-If dp\camZoom > 1.1 Then dp\camZoom = 1.1
+dp\camZoom = Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan(ATan(Tan(FOV/2.0)*RealGraphicWidth/RealGraphicHeight))
 
 	
                                 	;Local pvt%
@@ -6524,29 +6516,52 @@ If dp\camZoom > 1.1 Then dp\camZoom = 1.1
 	                                EndIf
 	
                                 	; camera offset in room-local portal space
-camOffsetX =( EntityX(Camera,True) - EntityX(e\room\Objects[2],True))
-camOffsetY = (EntityY(Camera,True) - (e\room\y + 0.3))
-camOffsetZ = (EntityZ(Camera,True) - EntityZ(e\room\Objects[2],True))
+Local baseEyeOffset# = 0.6+(CrouchState*-0.3)
+Local bobOffsetY# = EntityY(Camera,True)-EntityY(Collider,True)-baseEyeOffset
+Local portalBobScale# = 0.965-(CrouchState*0.005)
 
-PositionEntity pvt, EntityX(usedDoor,True), EntityY(usedDoor,True), EntityZ(usedDoor,True), True
-RotateEntity pvt, 0, EntityYaw(usedDoor,True), 0, True
-MoveEntity pvt, 0, 0, -1.8
+camOffsetY = (EntityY(Collider,True)-(e\room\y+0.3))+baseEyeOffset+(bobOffsetY*portalBobScale)
+
+Local srcLocalX#
+Local srcLocalY#
+Local srcLocalZ#
+Local destLocalX#
+Local destLocalZ#
+Local destWorldX#
+Local destWorldZ#
+Local portalMoveScale# = 0.954-(CrouchState*0.004)
+Local parallaxX# = portalMoveScale
+Local parallaxZ# = portalMoveScale
+
+Local yBias# = 0.135+(CrouchState*0.015)
+Local doorDepthBias# = -1.8
+
+TFormPoint EntityX(Camera,True),EntityY(Camera,True),EntityZ(Camera,True),0,dp\portal
+srcLocalX = TFormedX()
+srcLocalY = TFormedY()
+srcLocalZ = TFormedZ()
+
+destLocalX = -srcLocalX*parallaxX
+destLocalZ = -srcLocalZ*parallaxZ+doorDepthBias
+
+PositionEntity pvt,EntityX(usedDoor,True),EntityY(usedDoor,True),EntityZ(usedDoor,True),True
+RotateEntity pvt,0,EntityYaw(usedDoor,True),0,True
+
+TFormPoint destLocalX,0.0,destLocalZ,pvt,0
+destWorldX = TFormedX()
+destWorldZ = TFormedZ()
+
+PositionEntity dp\cam,destWorldX,EntityY(usedDoor,True)+camOffsetY+yBias,destWorldZ,True
 
 sourceYaw = EntityYaw(dp\portal,True)
 destYaw   = EntityYaw(usedDoor,True)
-yawDelta  = WrapAngle(destYaw - sourceYaw + 180.0)
+yawDelta  = WrapAngle(destYaw-sourceYaw+180.0)
 
-Local parallax# = 0.4
-Local yBias# = 0.12
-
-Local rotX# = (camOffsetX * Cos(yawDelta) - camOffsetZ * Sin(yawDelta)) * parallax
-Local rotZ# = (camOffsetX * Sin(yawDelta) + camOffsetZ * Cos(yawDelta)) * parallax
-
-PositionEntity dp\cam, EntityX(pvt,True) + rotX, EntityY(usedDoor,True) + camOffsetY + yBias, EntityZ(pvt,True) + rotZ, True
-
-dp\camyaw = WrapAngle(EntityYaw(Camera,True) + yawDelta)
+dp\camyaw = WrapAngle(EntityYaw(Camera,True)+yawDelta)
 dp\campitch = EntityPitch(Camera,True)
-dp\camroll = 0.0
+
+Local portalRollScale# = 0.955-(CrouchState*0.005)
+dp\camroll = EntityRoll(Camera,True)*portalRollScale
 	
 	                                FreeEntity pvt
 	

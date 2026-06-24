@@ -1017,7 +1017,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("SCP-173 will make you go nuts.")
 							CreateConsoleMsg("******************************")
-                        Case "izumi kato", "untitled 2004"
+                        Case "izumikato", "untitled2004"
 							CreateConsoleMsg("HELP - izumi kato")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Izumi Kato is the original artist")
@@ -1390,7 +1390,7 @@ Function UpdateConsole()
 						CreateConsoleMsg("SCP-173 is already set to the Remastered Model.")
 					EndIf
 					;[End Block]
-				Case "Izumi Kato", "izumi kato scp-173", "Untitled 2004", "untitled 2004", "untitled 2004 scp-173"
+				Case "IzumiKato", "untitled2004"
 					;[Block]
 					If Loaded173Model$ <> "Inward3D" Then
 					HalloweenTex = HalloweenTex
@@ -2787,10 +2787,16 @@ Function UpdateDoors()
 								dist# = Distance(EntityX(Collider, True), EntityZ(Collider, True), EntityX(d\buttons[i], True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
 								If dist < 0.7 Then
 									Local temp% = CreatePivot()
-									PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
+									Local pickRange# = 0.6
+									If ThirdPerson Then
+										PositionEntity temp, EntityX(Collider, True), EntityY(Collider, True) + 0.6 + CrouchState * -0.3, EntityZ(Collider, True), True
+										pickRange = 1.15
+									Else
+										PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
+									EndIf
 									PointEntity temp,d\buttons[i]
 									
-									If EntityPick(temp, 0.6) = d\buttons[i] Then
+									If EntityPick(temp, pickRange) = d\buttons[i] Then
 										If ClosestButton = 0 Then
 											ClosestButton = d\buttons[i]
 											ClosestDoor = d
@@ -5471,6 +5477,9 @@ Function UpdateThirdPersonCamera%()
 	
 	Local targetHeight#
 	Local cameraHeight#
+	Local camPitch#
+	Local camYaw#
+	Local camRoll#
 	
 	targetHeight = ThirdPersonTargetHeight
 	cameraHeight = ThirdPersonHeight
@@ -5483,9 +5492,14 @@ Function UpdateThirdPersonCamera%()
 	ThirdPersonCurrentTargetHeight = CurveValue(targetHeight, ThirdPersonCurrentTargetHeight, 8.0)
 	ThirdPersonCurrentHeight = CurveValue(cameraHeight, ThirdPersonCurrentHeight, 8.0)
 	
+	camPitch = EntityPitch(Camera, True)
+	camYaw = EntityYaw(Collider, True)
+	camRoll = EntityRoll(Camera, True)
 	PositionEntity Camera, EntityX(Collider, True), EntityY(Collider, True) + ThirdPersonCurrentTargetHeight, EntityZ(Collider, True), True
-	RotateEntity Camera, EntityPitch(Camera, True), EntityYaw(Collider, True), 0.0, True
-	MoveEntity Camera, 0.12, ThirdPersonCurrentHeight, -ThirdPersonDist
+	RotateEntity Camera, 0.0, camYaw, 0.0, True
+	MoveEntity Camera, 0.12, 0.0, -ThirdPersonDist
+	TranslateEntity Camera, 0.0, ThirdPersonCurrentHeight, 0.0, True
+	RotateEntity Camera, camPitch, camYaw, camRoll, True
 End Function
 
 ;--------------------------------------- GUI, menu etc ------------------------------------------------

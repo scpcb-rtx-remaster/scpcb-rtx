@@ -2102,7 +2102,7 @@ Function FillRoom(r.Rooms)
 			;EntityParent fr\Forest_Pivot,r\obj
 			
 			PositionEntity dp\cam,EntityX(fr\Door[1],True),r\y+31.0,EntityZ(fr\Door[1],True),True
-			dp\camyaw=EntityYaw(fr\Door[0],True)
+			dp\camyaw=EntityYaw(fr\Door[1],True)
 			RotateEntity dp\cam, 0, dp\camyaw, 0, True
 			MoveEntity dp\cam, 0,0,0.5
 			
