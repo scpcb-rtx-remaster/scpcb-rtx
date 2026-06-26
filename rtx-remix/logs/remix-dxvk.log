@@ -1,0 +1,596 @@
+[18:39:22.129] info:  Game: SCP - Containment Breach RTX Remaster.exe
+[18:39:22.129] info:  DXVK_Remix: remix-main+d7a2923c
+[18:39:22.129] info:  System Information Report:
+[18:39:22.129] info:    CPU: (GenuineIntel) 13th Gen Intel(R) Core(TM) i5-13600KF
+[18:39:22.129] info:    Memory: 11.41 GiB / 31.79 GiB physical, 15.69 GiB / 79.79 GiB committed, 4.81 GiB / 128.00 TiB virtual (current process)
+[18:39:22.129] info:    OS: Windows 10.0 Build 26200
+[18:39:22.129] info:  Init config: User
+[18:39:22.129] info:  Looking for config: User
+[18:39:22.129] info:  Attempting to parse: dxvk.conf at CWD("T:\\Folders in T drive\\RTX Remaster\\Github\\scpcb-rtx")...
+[18:39:22.129] info:  No config file found at: dxvk.conf
+[18:39:22.129] warn:  [RTX Option]: Failed to load valid config for layer 'dxvk.conf' with priority 1.
+[18:39:22.129] info:  Set user specific config.
+[18:39:22.129] info:  Init config: App
+[18:39:22.129] info:  Looking for config: App
+[18:39:22.133] info:  Did not find app config for executable: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\SCP - Containment Breach RTX Remaster.exe
+[18:39:22.133] warn:  [RTX Option]: Failed to load valid config for layer '<APPLICATION DEFAULT>' with priority 0.
+[18:39:22.133] info:  Set startup config.
+[18:39:22.133] info:  Init config: RtxUser
+[18:39:22.133] info:  Looking for config: RtxUser
+[18:39:22.133] info:  Attempting to parse: rtx.conf at CWD("T:\\Folders in T drive\\RTX Remaster\\Github\\scpcb-rtx")...
+[18:39:22.133] info:  No config file found at: rtx.conf
+[18:39:22.133] info:  Attempting to parse option layer: rtx.conf...
+[18:39:22.133] info:  No config file found at: rtx.conf
+[18:39:22.133] warn:  [RTX Option]: Failed to load valid config for layer 'rtx.conf' with priority 2.
+[18:39:22.133] info:  Set custom config.
+[18:39:22.133] info:  Init config: RtxMod
+[18:39:22.133] info:  No base game mod path found. Skipping initialization.
+[18:39:22.133] info:  Attempting to parse option layer: quality.conf...
+[18:39:22.133] info:  No config file found at: quality.conf
+[18:39:22.133] warn:  [RTX Option]: Failed to load valid config for layer 'quality.conf' with priority 3.
+[18:39:22.133] info:  Set quality configs.
+[18:39:22.133] info:  Attempting to parse option layer: user.conf...
+[18:39:22.140] info:  Found config file: user.conf
+[18:39:22.140] info:  Parsed config file.
+[18:39:22.140] info:  Set user realtime configs.
+[18:39:22.141] info:  [RTX Neural Radiance Cache] Selected High preset mode.
+[18:39:22.141] info:  Geometry generation hash rule:
+[18:39:22.141] info:  	positions
+[18:39:22.141] info:  	indices
+[18:39:22.141] info:  	texcoords
+[18:39:22.141] info:  	geometrydescriptor
+[18:39:22.141] info:  	vertexlayout
+[18:39:22.141] info:  	vertexshader
+[18:39:22.141] info:  Geometry asset hash rule:
+[18:39:22.141] info:  	positions
+[18:39:22.141] info:  	indices
+[18:39:22.141] info:  	geometrydescriptor
+[18:39:22.141] info:  Built-in extension providers:
+[18:39:22.141] info:    Win32 WSI
+[18:39:22.141] info:    OpenVR
+[18:39:22.141] info:    OpenXR
+[18:39:22.142] info:  OpenVR: could not open registry key, status 2
+[18:39:22.142] info:  OpenVR: Failed to locate module
+[18:39:22.212] info:  Enabled instance extensions:
+[18:39:22.212] info:    VK_KHR_external_memory_capabilities
+[18:39:22.212] info:    VK_KHR_external_semaphore_capabilities
+[18:39:22.212] info:    VK_KHR_get_physical_device_properties2
+[18:39:22.212] info:    VK_KHR_get_surface_capabilities2
+[18:39:22.212] info:    VK_KHR_surface
+[18:39:22.212] info:    VK_KHR_win32_surface
+[18:39:22.218] info:  Enabled Layer Names:
+[18:39:22.259] info:  D3D9: VK_FORMAT_D16_UNORM_S8_UINT -> VK_FORMAT_D24_UNORM_S8_UINT
+[18:39:22.259] info:  NVIDIA GeForce RTX 4070 Ti:
+[18:39:22.259] info:    Driver: 591.86.0
+[18:39:22.259] info:    Vulkan: 1.4.325
+[18:39:22.259] info:    Memory Heap[0]: 
+[18:39:22.259] info:      Size: 11996 MiB
+[18:39:22.259] info:      Flags: 0x1
+[18:39:22.259] info:      Memory Type[1]: Property Flags = 0x1
+[18:39:22.259] info:    Memory Heap[1]: 
+[18:39:22.259] info:      Size: 16276 MiB
+[18:39:22.259] info:      Flags: 0x0
+[18:39:22.259] info:      Memory Type[0]: Property Flags = 0x0
+[18:39:22.259] info:      Memory Type[2]: Property Flags = 0x6
+[18:39:22.259] info:      Memory Type[3]: Property Flags = 0xe
+[18:39:22.259] info:    Memory Heap[2]: 
+[18:39:22.259] info:      Size: 214 MiB
+[18:39:22.259] info:      Flags: 0x1
+[18:39:22.259] info:      Memory Type[4]: Property Flags = 0x7
+[18:39:22.259] info:  Process set as DPI aware
+[18:39:22.285] info:  Device properties:
+[18:39:22.285] info:    Device name:     : NVIDIA GeForce RTX 4070 Ti
+[18:39:22.285] info:    Vendor name:     : NVIDIA
+[18:39:22.285] info:    Device ID:       : 0x2782
+[18:39:22.285] info:    Vendor ID:       : 0x10de
+[18:39:22.285] info:    Driver version   : 591.86.0
+[18:39:22.285] info:  Enabled device extensions:
+[18:39:22.285] info:    VK_EXT_4444_formats
+[18:39:22.285] info:    VK_EXT_calibrated_timestamps
+[18:39:22.285] info:    VK_EXT_conservative_rasterization
+[18:39:22.285] info:    VK_EXT_custom_border_color
+[18:39:22.285] info:    VK_EXT_depth_clip_enable
+[18:39:22.285] info:    VK_EXT_extended_dynamic_state
+[18:39:22.285] info:    VK_EXT_full_screen_exclusive
+[18:39:22.285] info:    VK_EXT_memory_priority
+[18:39:22.285] info:    VK_EXT_opacity_micromap
+[18:39:22.285] info:    VK_EXT_robustness2
+[18:39:22.285] info:    VK_EXT_shader_atomic_float
+[18:39:22.285] info:    VK_EXT_shader_demote_to_helper_invocation
+[18:39:22.285] info:    VK_EXT_shader_viewport_index_layer
+[18:39:22.285] info:    VK_EXT_transform_feedback
+[18:39:22.285] info:    VK_EXT_vertex_attribute_divisor
+[18:39:22.285] info:    VK_KHR_acceleration_structure
+[18:39:22.285] info:    VK_KHR_buffer_device_address
+[18:39:22.285] info:    VK_KHR_create_renderpass2
+[18:39:22.285] info:    VK_KHR_deferred_host_operations
+[18:39:22.285] info:    VK_KHR_depth_stencil_resolve
+[18:39:22.285] info:    VK_KHR_draw_indirect_count
+[18:39:22.285] info:    VK_KHR_driver_properties
+[18:39:22.285] info:    VK_KHR_external_memory
+[18:39:22.285] info:    VK_KHR_external_memory_win32
+[18:39:22.285] info:    VK_KHR_external_semaphore
+[18:39:22.285] info:    VK_KHR_external_semaphore_win32
+[18:39:22.285] info:    VK_KHR_image_format_list
+[18:39:22.285] info:    VK_KHR_maintenance4
+[18:39:22.285] info:    VK_KHR_pipeline_library
+[18:39:22.285] info:    VK_KHR_push_descriptor
+[18:39:22.285] info:    VK_KHR_ray_query
+[18:39:22.285] info:    VK_KHR_ray_tracing_pipeline
+[18:39:22.285] info:    VK_KHR_sampler_mirror_clamp_to_edge
+[18:39:22.285] info:    VK_KHR_shader_float16_int8
+[18:39:22.285] info:    VK_KHR_shader_float_controls
+[18:39:22.285] info:    VK_KHR_swapchain
+[18:39:22.285] info:    VK_KHR_synchronization2
+[18:39:22.285] info:    VK_NVX_binary_import
+[18:39:22.285] info:    VK_NVX_image_view_handle
+[18:39:22.285] info:    VK_NV_low_latency
+[18:39:22.285] info:    VK_NV_present_metering
+[18:39:22.285] info:    VK_NV_ray_tracing_invocation_reorder
+[18:39:22.286] info:  Device features:
+[18:39:22.286] info:    robustBufferAccess                     : 1
+[18:39:22.286] info:    fullDrawIndexUint32                    : 1
+[18:39:22.286] info:    imageCubeArray                         : 1
+[18:39:22.286] info:    independentBlend                       : 1
+[18:39:22.286] info:    geometryShader                         : 1
+[18:39:22.286] info:    tessellationShader                     : 0
+[18:39:22.286] info:    sampleRateShading                      : 1
+[18:39:22.286] info:    dualSrcBlend                           : 0
+[18:39:22.286] info:    logicOp                                : 0
+[18:39:22.286] info:    multiDrawIndirect                      : 0
+[18:39:22.286] info:    drawIndirectFirstInstance              : 0
+[18:39:22.286] info:    depthClamp                             : 1
+[18:39:22.286] info:    depthBiasClamp                         : 1
+[18:39:22.286] info:    fillModeNonSolid                       : 1
+[18:39:22.286] info:    depthBounds                            : 1
+[18:39:22.286] info:    multiViewport                          : 1
+[18:39:22.286] info:    samplerAnisotropy                      : 1
+[18:39:22.286] info:    textureCompressionBC                   : 1
+[18:39:22.286] info:    occlusionQueryPrecise                  : 1
+[18:39:22.286] info:    pipelineStatisticsQuery                : 1
+[18:39:22.286] info:    vertexPipelineStoresAndAtomics         : 1
+[18:39:22.286] info:    fragmentStoresAndAtomics               : 0
+[18:39:22.286] info:    shaderImageGatherExtended              : 0
+[18:39:22.286] info:    shaderStorageImageExtendedFormats      : 0
+[18:39:22.286] info:    shaderStorageImageReadWithoutFormat    : 0
+[18:39:22.286] info:    shaderStorageImageWriteWithoutFormat   : 1
+[18:39:22.286] info:    shaderClipDistance                     : 1
+[18:39:22.286] info:    shaderCullDistance                     : 1
+[18:39:22.286] info:    shaderFloat64                          : 0
+[18:39:22.286] info:    shaderInt64                            : 0
+[18:39:22.286] info:    variableMultisampleRate                : 0
+[18:39:22.286] info:    hostQueryReset                         : 1
+[18:39:22.286] info:    scalarBlockLayout                      : 1
+[18:39:22.286] info:    uniformBufferStandardLayout            : 1
+[18:39:22.286] info:  VK_EXT_4444_formats
+[18:39:22.286] info:    formatA4R4G4B4                         : 1
+[18:39:22.286] info:    formatA4B4G4R4                         : 1
+[18:39:22.286] info:  VK_EXT_custom_border_color
+[18:39:22.286] info:    customBorderColors                     : 1
+[18:39:22.286] info:    customBorderColorWithoutFormat         : 1
+[18:39:22.286] info:  VK_EXT_depth_clip_enable
+[18:39:22.286] info:    depthClipEnable                        : 1
+[18:39:22.286] info:  VK_EXT_extended_dynamic_state
+[18:39:22.286] info:    extendedDynamicState                   : 1
+[18:39:22.286] info:  VK_EXT_memory_priority
+[18:39:22.286] info:    memoryPriority                         : 1
+[18:39:22.286] info:  VK_EXT_robustness2
+[18:39:22.286] info:    robustBufferAccess2                    : 1
+[18:39:22.286] info:    robustImageAccess2                     : 0
+[18:39:22.286] info:    nullDescriptor                         : 1
+[18:39:22.286] info:  VK_EXT_shader_demote_to_helper_invocation
+[18:39:22.286] info:    shaderDemoteToHelperInvocation         : 1
+[18:39:22.286] info:  VK_EXT_transform_feedback
+[18:39:22.286] info:    transformFeedback                      : 1
+[18:39:22.286] info:    geometryStreams                        : 0
+[18:39:22.286] info:  VK_EXT_vertex_attribute_divisor
+[18:39:22.286] info:    vertexAttributeInstanceRateDivisor     : 1
+[18:39:22.286] info:    vertexAttributeInstanceRateZeroDivisor : 1
+[18:39:22.286] info:  VK_KHR_buffer_device_address
+[18:39:22.286] info:    bufferDeviceAddress                    : 1
+[18:39:22.286] info:  Queue families:
+[18:39:22.286] info:    Graphics : 0
+[18:39:22.286] info:    Transfer : 1
+[18:39:22.286] info:    Async Compute : 2
+[18:39:22.286] info:    Present : 2
+[18:39:22.400] warn:  DXVK: No state cache file found
+[18:39:22.400] warn:  DXVK: Creating new state cache file
+[18:39:22.405] info:  DXVK: Using 13 compiler threads
+[18:39:22.432] info:  USD plugin, Remix loaded!
+[18:39:22.433] info:  [RTX info] Neural Radiance Cache: supported
+[18:39:23.993] info:  Reflex initialized successfully.
+[18:39:24.000] info:  Automatic Raytrace Mode Preset in use (Set rtx.raytraceModePreset to something other than Auto use a non-automatic preset)
+[18:39:24.000] info:  NVIDIA architecture detected, setting default raytrace modes to Trace Ray (Indirect Integrate) and Ray Query (GBuffer, Direct Integrate)
+[18:39:24.060] info:  [RTX info] Opacity Micromap: supported
+[18:39:24.060] info:  [RTX info] Shader Execution Reordering: supported
+[18:39:24.060] info:  [RTX info] Shader Execution Reordering: enabled
+[18:39:24.060] info:  CPU supports SIMD: AVX2
+[18:39:24.065] info:  D3D9DeviceEx::ResetSwapChain:
+[18:39:24.065] info:    Requested Presentation Parameters
+[18:39:24.065] info:      - Width:              400
+[18:39:24.065] info:      - Height:             300
+[18:39:24.065] info:      - Format:             D3D9Format::X8R8G8B8
+[18:39:24.065] info:      - Auto Depth Stencil: true
+[18:39:24.065] info:                  ^ Format: D3D9Format::D24S8
+[18:39:24.065] info:      - Windowed:           true
+[18:39:24.100] info:  No winproc detected, initiating bridge message channel for: 00000001000E0536
+[18:39:24.101] info:  Adding asset search path: t:\folders in t drive\rtx remaster\github\scpcb-rtx\rtx-remix\mods\scpcb-rtx-dx9-proj\
+[18:39:24.132] err:   Texture t:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\SubUSDs\tesla.e.rtex.dds asset data cannot be found or corrupted.
+[18:39:24.135] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Ice.usd
+[18:39:24.135] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Lens.usd
+[18:39:24.135] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeCamera_A01_01.usd
+[18:39:24.135] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeDigital_A02_01.usd
+[18:39:24.135] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A01_01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A02_01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A03_01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_RTX_CompanionCube_A1_01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_RollCage.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Healthpack.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Space.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Pillow_A.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Ceramic.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Wood.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeDigital_A01_01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_SteamPunk_A01.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_ArtsAndCrafts.usd
+[18:39:24.136] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Cubus.usd
+[18:39:24.378] info:  Message channel UWM_REMIX_BRIDGE_REGISTER_THREADPROC_MSG established.
+[18:39:24.531] info:  Device properties:
+[18:39:24.531] info:    Device name:     : NVIDIA GeForce RTX 4070 Ti
+[18:39:24.531] info:    Vendor name:     : NVIDIA
+[18:39:24.531] info:    Device ID:       : 0x2782
+[18:39:24.531] info:    Vendor ID:       : 0x10de
+[18:39:24.531] info:    Driver version   : 591.86.0
+[18:39:24.532] info:  Enabled device extensions:
+[18:39:24.532] info:    VK_EXT_4444_formats
+[18:39:24.532] info:    VK_EXT_calibrated_timestamps
+[18:39:24.532] info:    VK_EXT_conservative_rasterization
+[18:39:24.532] info:    VK_EXT_custom_border_color
+[18:39:24.532] info:    VK_EXT_depth_clip_enable
+[18:39:24.532] info:    VK_EXT_extended_dynamic_state
+[18:39:24.532] info:    VK_EXT_full_screen_exclusive
+[18:39:24.532] info:    VK_EXT_memory_priority
+[18:39:24.532] info:    VK_EXT_opacity_micromap
+[18:39:24.532] info:    VK_EXT_robustness2
+[18:39:24.532] info:    VK_EXT_shader_atomic_float
+[18:39:24.532] info:    VK_EXT_shader_demote_to_helper_invocation
+[18:39:24.532] info:    VK_EXT_shader_viewport_index_layer
+[18:39:24.532] info:    VK_EXT_transform_feedback
+[18:39:24.532] info:    VK_EXT_vertex_attribute_divisor
+[18:39:24.532] info:    VK_KHR_acceleration_structure
+[18:39:24.532] info:    VK_KHR_buffer_device_address
+[18:39:24.532] info:    VK_KHR_create_renderpass2
+[18:39:24.532] info:    VK_KHR_deferred_host_operations
+[18:39:24.532] info:    VK_KHR_depth_stencil_resolve
+[18:39:24.532] info:    VK_KHR_draw_indirect_count
+[18:39:24.532] info:    VK_KHR_driver_properties
+[18:39:24.532] info:    VK_KHR_external_memory
+[18:39:24.532] info:    VK_KHR_external_memory_win32
+[18:39:24.532] info:    VK_KHR_external_semaphore
+[18:39:24.532] info:    VK_KHR_external_semaphore_win32
+[18:39:24.532] info:    VK_KHR_image_format_list
+[18:39:24.532] info:    VK_KHR_maintenance4
+[18:39:24.532] info:    VK_KHR_pipeline_library
+[18:39:24.532] info:    VK_KHR_push_descriptor
+[18:39:24.532] info:    VK_KHR_ray_query
+[18:39:24.532] info:    VK_KHR_ray_tracing_pipeline
+[18:39:24.532] info:    VK_KHR_sampler_mirror_clamp_to_edge
+[18:39:24.532] info:    VK_KHR_shader_float16_int8
+[18:39:24.532] info:    VK_KHR_shader_float_controls
+[18:39:24.532] info:    VK_KHR_swapchain
+[18:39:24.532] info:    VK_KHR_synchronization2
+[18:39:24.532] info:    VK_NVX_binary_import
+[18:39:24.532] info:    VK_NVX_image_view_handle
+[18:39:24.532] info:    VK_NV_low_latency
+[18:39:24.532] info:    VK_NV_present_metering
+[18:39:24.532] info:    VK_NV_ray_tracing_invocation_reorder
+[18:39:24.532] info:  Device features:
+[18:39:24.532] info:    robustBufferAccess                     : 1
+[18:39:24.532] info:    fullDrawIndexUint32                    : 1
+[18:39:24.532] info:    imageCubeArray                         : 1
+[18:39:24.532] info:    independentBlend                       : 1
+[18:39:24.532] info:    geometryShader                         : 1
+[18:39:24.532] info:    tessellationShader                     : 0
+[18:39:24.532] info:    sampleRateShading                      : 1
+[18:39:24.532] info:    dualSrcBlend                           : 0
+[18:39:24.532] info:    logicOp                                : 0
+[18:39:24.532] info:    multiDrawIndirect                      : 0
+[18:39:24.532] info:    drawIndirectFirstInstance              : 0
+[18:39:24.532] info:    depthClamp                             : 1
+[18:39:24.532] info:    depthBiasClamp                         : 1
+[18:39:24.532] info:    fillModeNonSolid                       : 1
+[18:39:24.532] info:    depthBounds                            : 1
+[18:39:24.532] info:    multiViewport                          : 1
+[18:39:24.532] info:    samplerAnisotropy                      : 1
+[18:39:24.532] info:    textureCompressionBC                   : 1
+[18:39:24.532] info:    occlusionQueryPrecise                  : 1
+[18:39:24.532] info:    pipelineStatisticsQuery                : 1
+[18:39:24.532] info:    vertexPipelineStoresAndAtomics         : 1
+[18:39:24.532] info:    fragmentStoresAndAtomics               : 0
+[18:39:24.532] info:    shaderImageGatherExtended              : 0
+[18:39:24.532] info:    shaderStorageImageExtendedFormats      : 0
+[18:39:24.532] info:    shaderStorageImageReadWithoutFormat    : 0
+[18:39:24.532] info:    shaderStorageImageWriteWithoutFormat   : 1
+[18:39:24.532] info:    shaderClipDistance                     : 1
+[18:39:24.532] info:    shaderCullDistance                     : 1
+[18:39:24.532] info:    shaderFloat64                          : 0
+[18:39:24.532] info:    shaderInt64                            : 0
+[18:39:24.532] info:    variableMultisampleRate                : 0
+[18:39:24.532] info:    hostQueryReset                         : 1
+[18:39:24.532] info:    scalarBlockLayout                      : 1
+[18:39:24.532] info:    uniformBufferStandardLayout            : 1
+[18:39:24.532] info:  VK_EXT_4444_formats
+[18:39:24.532] info:    formatA4R4G4B4                         : 1
+[18:39:24.532] info:    formatA4B4G4R4                         : 1
+[18:39:24.532] info:  VK_EXT_custom_border_color
+[18:39:24.532] info:    customBorderColors                     : 1
+[18:39:24.532] info:    customBorderColorWithoutFormat         : 1
+[18:39:24.532] info:  VK_EXT_depth_clip_enable
+[18:39:24.532] info:    depthClipEnable                        : 1
+[18:39:24.532] info:  VK_EXT_extended_dynamic_state
+[18:39:24.532] info:    extendedDynamicState                   : 1
+[18:39:24.532] info:  VK_EXT_memory_priority
+[18:39:24.532] info:    memoryPriority                         : 1
+[18:39:24.532] info:  VK_EXT_robustness2
+[18:39:24.532] info:    robustBufferAccess2                    : 1
+[18:39:24.532] info:    robustImageAccess2                     : 0
+[18:39:24.532] info:    nullDescriptor                         : 1
+[18:39:24.532] info:  VK_EXT_shader_demote_to_helper_invocation
+[18:39:24.532] info:    shaderDemoteToHelperInvocation         : 1
+[18:39:24.532] info:  VK_EXT_transform_feedback
+[18:39:24.532] info:    transformFeedback                      : 1
+[18:39:24.532] info:    geometryStreams                        : 0
+[18:39:24.532] info:  VK_EXT_vertex_attribute_divisor
+[18:39:24.532] info:    vertexAttributeInstanceRateDivisor     : 1
+[18:39:24.532] info:    vertexAttributeInstanceRateZeroDivisor : 1
+[18:39:24.532] info:  VK_KHR_buffer_device_address
+[18:39:24.532] info:    bufferDeviceAddress                    : 1
+[18:39:24.532] info:  Queue families:
+[18:39:24.532] info:    Graphics : 0
+[18:39:24.532] info:    Transfer : 1
+[18:39:24.532] info:    Async Compute : 2
+[18:39:24.532] info:    Present : 2
+[18:39:24.617] info:  DXVK: Read 0 valid state cache entries
+[18:39:24.617] info:  DXVK: Using 13 compiler threads
+[18:39:24.618] warn:  usd plugins were not loaded
+[18:39:24.643] warn:  Reflex PCL stats multiple initialization detected.
+[18:39:24.643] info:  Reflex initialized successfully.
+[18:39:24.650] info:  Automatic Raytrace Mode Preset in use (Set rtx.raytraceModePreset to something other than Auto use a non-automatic preset)
+[18:39:24.650] info:  NVIDIA architecture detected, setting default raytrace modes to Trace Ray (Indirect Integrate) and Ray Query (GBuffer, Direct Integrate)
+[18:39:24.651] info:  [RTX info] Opacity Micromap: supported
+[18:39:24.651] info:  [RTX info] Shader Execution Reordering: supported
+[18:39:24.651] info:  [RTX info] Shader Execution Reordering: enabled
+[18:39:24.651] info:  CPU supports SIMD: AVX2
+[18:39:24.653] err:   Texture t:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\SubUSDs\tesla.e.rtex.dds asset data cannot be found or corrupted.
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Ice.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Lens.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeCamera_A01_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeDigital_A02_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A01_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A02_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeIsogrid_A03_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_RTX_CompanionCube_A1_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_RollCage.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Healthpack.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Space.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Pillow_A.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Ceramic.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Wood.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCubeDigital_A01_01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_SteamPunk_A01.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_ArtsAndCrafts.usd
+[18:39:24.655] warn:  [SecretReplacement] Could not find stage: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\rtx-remix\mods\SCPCB-RTX-DX9-Proj\./SubUSDs/SM_Prop_CompanionCube_Cubus.usd
+[18:39:24.658] info:  D3D9DeviceEx::ResetSwapChain:
+[18:39:24.658] info:    Requested Presentation Parameters
+[18:39:24.658] info:      - Width:              1920
+[18:39:24.658] info:      - Height:             1080
+[18:39:24.658] info:      - Format:             D3D9Format::X8R8G8B8
+[18:39:24.658] info:      - Auto Depth Stencil: true
+[18:39:24.658] info:                  ^ Format: D3D9Format::D24S8
+[18:39:24.658] info:      - Windowed:           true
+[18:39:24.673] info:  No winproc detected, initiating bridge message channel for: 00000001000E0536
+[18:39:24.751] warn:  D3D9Texture2D::QueryInterface: Unknown interface query
+[18:39:24.751] warn:  794950f2-adfc-458a-905e-10a10b0b503b
+[18:39:25.636] warn:  D3D9DeviceEx::SetRenderState: Unhandled render state D3DRS_MULTISAMPLEANTIALIAS
+[18:39:25.636] info:  [RTX-Compatibility-Info] Skipped drawcall, using pre-transformed vertices which isn't currently supported.
+[18:39:25.639] info:  Presenter: Actual swap chain properties:
+[18:39:25.639] info:    Format:       VK_FORMAT_R8G8B8A8_UNORM
+[18:39:25.639] info:    Present mode: VK_PRESENT_MODE_FIFO_KHR
+[18:39:25.639] info:    Buffer size:  1920x1080
+[18:39:25.639] info:    Image count:  3
+[18:39:25.639] info:    Exclusive FS: 2
+[18:39:25.827] info:  [RTX-Compatibility-Info] Trying to raytrace but not detecting a valid camera.
+[18:39:28.243] info:  D3D9DeviceEx::ResetSwapChain:
+[18:39:28.243] info:    Requested Presentation Parameters
+[18:39:28.243] info:      - Width:              1920
+[18:39:28.243] info:      - Height:             1080
+[18:39:28.243] info:      - Format:             D3D9Format::X8R8G8B8
+[18:39:28.243] info:      - Auto Depth Stencil: true
+[18:39:28.243] info:                  ^ Format: D3D9Format::D24S8
+[18:39:28.243] info:      - Windowed:           true
+[18:39:28.243] warn:  [D3D9WindowProc] Swapchain handle is invalid, some of its values may not be correct.
+[18:39:30.565] info:  D3D9DeviceEx::ResetSwapChain:
+[18:39:30.565] info:    Requested Presentation Parameters
+[18:39:30.565] info:      - Width:              1920
+[18:39:30.565] info:      - Height:             1080
+[18:39:30.565] info:      - Format:             D3D9Format::X8R8G8B8
+[18:39:30.565] info:      - Auto Depth Stencil: true
+[18:39:30.565] info:                  ^ Format: D3D9Format::D24S8
+[18:39:30.565] info:      - Windowed:           true
+[18:39:37.654] info:  [RTX-Compatibility-Info] Texture 0 without valid hash detected, skipping drawcall.
+[18:39:40.053] info:  [RTX] Opacity Micromap: enabled
+[18:39:40.062] info:  RenderPass GBuffer Raytrace Mode: Ray Query (CS)
+[18:39:40.062] info:  RenderPass Integrate Direct Raytrace Mode: Ray Query (CS)
+[18:39:40.062] info:  RenderPass Integrate Indirect Raytrace Mode: Trace Ray (RGS)
+[18:39:40.228] info:  [RTX Neural Radiance Cache] NRC SDK: Loading the default network config data.
+[18:39:40.241] info:  [RTX Neural Radiance Cache] NRC v0.13 (22 January 2025) Context successfully initialized. 
+[18:39:40.242] info:  [RTX-Compatibility-Info] Volume Froxel Max Distance set to 2000 but current camera frustum allows only a maximum of 5.94996
+[18:39:40.395] info:  [RTX] Integrate Indirect Mode: Neural Radiance Cache - activated
+[18:39:43.164] info:  D3D9DeviceEx::ResetSwapChain:
+[18:39:43.164] info:    Requested Presentation Parameters
+[18:39:43.164] info:      - Width:              1920
+[18:39:43.164] info:      - Height:             1080
+[18:39:43.164] info:      - Format:             D3D9Format::X8R8G8B8
+[18:39:43.164] info:      - Auto Depth Stencil: true
+[18:39:43.164] info:                  ^ Format: D3D9Format::D24S8
+[18:39:43.164] info:      - Windowed:           true
+[18:39:43.232] err:   Attempted to normalize a zero-length vector.
+[18:39:43.232] err:   Attempted invert a non-invertible matrix.
+[18:39:43.253] warn:  Found a null sampler. Fallback to linear-repeat
+[18:39:56.586] info:  [RTX-Compatibility-Info] Found a draw call to a non-primary, non-raytraced render target. Falling back to rasterization
+[18:41:16.436] info:  playermodelbodytextures - added 165F453A5F35C459
+[18:41:18.920] info:  playermodelbodytextures - removed 165F453A5F35C459
+[18:41:19.919] info:  playermodeltextures - added 165F453A5F35C459
+[18:41:21.736] info:  Serializing config file: user.conf
+[18:42:27.542] info:  uitextures - added CF42096DFFC9495B
+[18:42:28.008] info:  uitextures - removed CF42096DFFC9495B
+[18:42:31.165] info:  ignoretextures - removed F191C97F67B7E256
+[18:42:34.949] info:  skytextures - added F191C97F67B7E256
+[18:43:02.818] info:  skytextures - removed F191C97F67B7E256
+[18:43:04.234] info:  uitextures - added F191C97F67B7E256
+[18:43:05.009] info:  uitextures - removed F191C97F67B7E256
+[18:43:05.451] info:  uitextures - added F191C97F67B7E256
+[18:43:05.909] info:  uitextures - removed F191C97F67B7E256
+[18:43:06.401] info:  uitextures - added F191C97F67B7E256
+[18:43:06.593] info:  uitextures - removed F191C97F67B7E256
+[18:43:06.767] info:  uitextures - added F191C97F67B7E256
+[18:43:06.959] info:  uitextures - removed F191C97F67B7E256
+[18:43:07.151] info:  uitextures - added F191C97F67B7E256
+[18:43:07.343] info:  uitextures - removed F191C97F67B7E256
+[18:43:07.635] info:  uitextures - added F191C97F67B7E256
+[18:43:18.762] info:  raytracedRenderTargetTextures - added E4F94DBB9A7DCFAB
+[18:43:19.246] info:  raytracedRenderTargetTextures - removed E4F94DBB9A7DCFAB
+[18:43:40.480] info:  uitextures - added 384FCC81305200A6
+[18:43:40.829] info:  uitextures - removed 384FCC81305200A6
+[18:43:41.748] info:  lightmaptextures - added 384FCC81305200A6
+[18:43:42.063] info:  lightmaptextures - removed 384FCC81305200A6
+[18:43:42.480] info:  hidetextures - added 384FCC81305200A6
+[18:43:42.830] info:  hidetextures - removed 384FCC81305200A6
+[18:43:43.131] info:  ignoretextures - added 384FCC81305200A6
+[18:43:43.447] info:  ignoretextures - removed 384FCC81305200A6
+[18:44:10.281] info:  uitextures - removed F191C97F67B7E256
+[18:44:10.922] info:  worldspaceuitextures - added F191C97F67B7E256
+[18:44:11.456] info:  worldspaceuitextures - removed F191C97F67B7E256
+[18:44:11.840] info:  uitextures - added F191C97F67B7E256
+[18:44:12.332] info:  uitextures - removed F191C97F67B7E256
+[18:44:12.856] info:  uitextures - added F191C97F67B7E256
+[18:44:13.067] info:  uitextures - removed F191C97F67B7E256
+[18:44:13.256] info:  uitextures - added F191C97F67B7E256
+[18:44:13.449] info:  uitextures - removed F191C97F67B7E256
+[18:44:13.640] info:  uitextures - added F191C97F67B7E256
+[18:44:13.901] info:  uitextures - removed F191C97F67B7E256
+[18:44:14.790] info:  uitextures - added F191C97F67B7E256
+[18:44:15.482] info:  uitextures - removed F191C97F67B7E256
+[18:44:16.407] info:  uitextures - added F191C97F67B7E256
+[18:44:16.716] info:  uitextures - removed F191C97F67B7E256
+[18:44:16.956] info:  uitextures - added F191C97F67B7E256
+[18:44:17.133] info:  uitextures - removed F191C97F67B7E256
+[18:44:17.322] info:  uitextures - added F191C97F67B7E256
+[18:44:17.516] info:  uitextures - removed F191C97F67B7E256
+[18:44:17.789] info:  uitextures - added F191C97F67B7E256
+[18:44:17.999] info:  uitextures - removed F191C97F67B7E256
+[18:44:18.173] info:  uitextures - added F191C97F67B7E256
+[18:44:18.367] info:  uitextures - removed F191C97F67B7E256
+[18:44:18.573] info:  uitextures - added F191C97F67B7E256
+[18:44:18.766] info:  uitextures - removed F191C97F67B7E256
+[18:44:18.939] info:  uitextures - added F191C97F67B7E256
+[18:44:19.216] info:  uitextures - removed F191C97F67B7E256
+[18:44:19.440] info:  uitextures - added F191C97F67B7E256
+[18:44:19.701] info:  uitextures - removed F191C97F67B7E256
+[18:44:19.940] info:  uitextures - added F191C97F67B7E256
+[18:44:21.315] info:  uitextures - removed F191C97F67B7E256
+[18:44:25.373] info:  raytracedRenderTargetTextures - added E4F94DBB9A7DCFAB
+[18:44:27.074] info:  uitextures - added F191C97F67B7E256
+[18:44:27.733] info:  uitextures - removed F191C97F67B7E256
+[18:44:28.107] info:  uitextures - added F191C97F67B7E256
+[18:44:40.816] info:  uitextures - removed F191C97F67B7E256
+[18:44:41.658] info:  hidetextures - added F191C97F67B7E256
+[18:44:42.542] info:  hidetextures - removed F191C97F67B7E256
+[18:44:43.108] info:  lightmaptextures - added F191C97F67B7E256
+[18:44:43.626] info:  lightmaptextures - removed F191C97F67B7E256
+[18:44:43.959] info:  hidetextures - added F191C97F67B7E256
+[18:44:45.292] info:  hidetextures - removed F191C97F67B7E256
+[18:44:45.692] info:  ignoretextures - added F191C97F67B7E256
+[18:44:47.135] info:  ignoretextures - removed F191C97F67B7E256
+[18:45:01.026] info:  uitextures - added F191C97F67B7E256
+[18:45:01.468] info:  uitextures - removed F191C97F67B7E256
+[18:45:02.326] info:  ignoretextures - added F191C97F67B7E256
+[18:45:04.052] info:  ignoretextures - removed F191C97F67B7E256
+[18:45:04.410] info:  hidetextures - added F191C97F67B7E256
+[18:45:04.861] info:  hidetextures - removed F191C97F67B7E256
+[18:45:05.360] info:  ignoretextures - added F191C97F67B7E256
+[18:45:05.902] info:  ignoretextures - removed F191C97F67B7E256
+[18:45:06.243] info:  hidetextures - added F191C97F67B7E256
+[18:45:14.094] info:  worldspaceuitextures - added CF42096DFFC9495B
+[18:45:14.527] info:  uitextures - added CF42096DFFC9495B
+[18:45:15.011] info:  worldspaceuitextures - removed CF42096DFFC9495B
+[18:45:15.678] info:  uitextures - removed CF42096DFFC9495B
+[18:45:16.928] info:  lightmaptextures - added CF42096DFFC9495B
+[18:45:17.343] info:  lightmaptextures - removed CF42096DFFC9495B
+[18:45:23.343] info:  uitextures - added 2691D9F79C253A21
+[18:45:23.811] info:  uitextures - removed 2691D9F79C253A21
+[18:45:24.461] info:  ignoretextures - added 2691D9F79C253A21
+[18:45:24.845] info:  ignoretextures - removed 2691D9F79C253A21
+[18:45:29.462] info:  uitextures - added 85ABA697C3F73821
+[18:45:29.829] info:  uitextures - removed 85ABA697C3F73821
+[18:45:30.728] info:  lightmaptextures - added 85ABA697C3F73821
+[18:45:31.163] info:  lightmaptextures - removed 85ABA697C3F73821
+[18:45:31.912] info:  hidetextures - added 85ABA697C3F73821
+[18:45:32.295] info:  hidetextures - removed 85ABA697C3F73821
+[18:45:37.829] info:  uitextures - added 3D233CBAD0983DAD
+[18:45:38.213] info:  uitextures - removed 3D233CBAD0983DAD
+[18:45:39.179] info:  ignorelights - added 3D233CBAD0983DAD
+[18:45:39.613] info:  lightmaptextures - added 3D233CBAD0983DAD
+[18:45:40.396] info:  ignorelights - removed 3D233CBAD0983DAD
+[18:45:40.746] info:  lightmaptextures - removed 3D233CBAD0983DAD
+[18:45:45.263] info:  uitextures - added 24ACF62D9A91C96C
+[18:45:45.680] info:  uitextures - removed 24ACF62D9A91C96C
+[18:45:47.780] info:  uitextures - added 066514326A1528F6
+[18:45:48.147] info:  uitextures - removed 066514326A1528F6
+[18:45:48.863] info:  hidetextures - added 066514326A1528F6
+[18:45:49.163] info:  hidetextures - removed 066514326A1528F6
+[18:45:54.963] info:  lightmaptextures - added C8B56F27D11C04E3
+[18:45:55.598] info:  lightmaptextures - removed C8B56F27D11C04E3
+[18:45:55.997] info:  lightmaptextures - added C8B56F27D11C04E3
+[18:45:56.648] info:  lightmaptextures - removed C8B56F27D11C04E3
+[18:45:58.247] info:  ignoretextures - added C8B56F27D11C04E3
+[18:45:58.847] info:  ignoretextures - removed C8B56F27D11C04E3
+[18:45:59.713] info:  skytextures - added C8B56F27D11C04E3
+[18:46:00.764] info:  ignoretextures - added C8B56F27D11C04E3
+[18:46:01.198] info:  skytextures - removed C8B56F27D11C04E3
+[18:46:02.181] info:  uitextures - added C8B56F27D11C04E3
+[18:46:02.873] info:  uitextures - removed C8B56F27D11C04E3
+[18:46:03.219] info:  uitextures - added C8B56F27D11C04E3
+[18:46:18.024] info:  uitextures - removed C8B56F27D11C04E3
+[18:46:18.949] info:  ignoretextures - removed C8B56F27D11C04E3
+[18:46:19.798] info:  skytextures - added C8B56F27D11C04E3
+[18:46:20.665] info:  skytextures - removed C8B56F27D11C04E3
+[18:46:22.482] info:  ignorelights - added C8B56F27D11C04E3
+[18:46:22.948] info:  ignorelights - removed C8B56F27D11C04E3
+[18:46:32.782] info:  raytracedRenderTargetTextures - added C81E3F846B4D1310
+[18:46:35.050] info:  lightmaptextures - removed 4052929624B32710
+[18:46:36.616] info:  hidetextures - added 4052929624B32710
+[18:47:30.953] info:  raytracedRenderTargetTextures - removed C81E3F846B4D1310
+[18:47:33.155] info:  lightmaptextures - added 4052929624B32710
+[18:47:34.138] info:  lightmaptextures - removed 4052929624B32710
+[18:47:34.522] info:  hidetextures - removed 4052929624B32710
+[18:47:35.254] info:  ignorelights - added 4052929624B32710
+[18:47:35.938] info:  ignorelights - removed 4052929624B32710
+[18:47:37.105] info:  lightmaptextures - added 4052929624B32710
+[18:47:37.555] info:  lightmaptextures - removed 4052929624B32710
+[18:47:39.955] info:  ignoretransparencytextures - added 4052929624B32710
+[18:47:40.405] info:  ignoretransparencytextures - removed 4052929624B32710
+[18:47:44.538] info:  playermodeltextures - added 4052929624B32710
+[18:47:50.223] info:  playermodeltextures - removed 4052929624B32710
+[18:47:52.273] info:  raytracedRenderTargetTextures - added 48EB4FC0A2B46391
+[18:47:52.840] info:  raytracedRenderTargetTextures - removed 48EB4FC0A2B46391
+[18:47:54.406] info:  raytracedRenderTargetTextures - added 48EB4FC0A2B46391
+[18:47:57.790] info:  raytracedRenderTargetTextures - removed 48EB4FC0A2B46391
+[18:48:02.607] info:  uitextures - added A33B4B34C7F58647
+[18:48:03.124] info:  uitextures - removed A33B4B34C7F58647
+[18:48:08.673] info:  uitextures - added 85F11E970911B00F
+[18:48:09.091] info:  uitextures - removed 85F11E970911B00F
+[18:48:09.824] info:  lightmaptextures - added 85F11E970911B00F
+[18:48:10.141] info:  lightmaptextures - removed 85F11E970911B00F
+[18:48:13.657] info:  lightmaptextures - added 4052929624B32710
+[18:48:51.186] err:   [78] common device objects were not disposed of.

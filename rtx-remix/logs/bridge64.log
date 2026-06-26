@@ -1,0 +1,53 @@
+[18:39:21.860] info:  [18:39:21.859] info:  No default config found for: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\SCP - Containment Breach RTX Remaster.exe
+[18:39:21.860] info:  [18:39:21.859] info:  Trying to open config file: T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\.trex\bridge.conf
+[18:39:21.860] info:  ==================
+[18:39:21.860] info:  NVIDIA RTX Remix Bridge Server
+[18:39:21.860] info:  ==================
+[18:39:21.860] info:  Version: remix-main+d7a2923c
+[18:39:21.860] info:  Running in x64 mode!
+[18:39:21.860] info:  Launched server with GUID 5b67843d-8d63-4420-98fa-92f6f55b4981
+[18:39:21.860] info:  Server started up, waiting for connection from client...
+[18:39:21.860] info:  Registering exit callback in case client exits unexpectedly.
+[18:39:21.860] info:  Registering message channel for asynchronous message handling.
+[18:39:21.860] info:  Initializing D3D9...
+[18:39:22.120] info:  Message channel MessageChannelServer established.
+[18:39:22.259] info:  D3D9 interface object creation succeeded!
+[18:39:22.259] info:  Loaded D3D9 from T:\Folders in T drive\RTX Remaster\Github\scpcb-rtx\.trex\d3d9.dll
+[18:39:22.260] info:  Version of d3d9 loaded is DXVK
+[18:39:22.260] info:  Feature version parity confirmed!
+[18:39:22.260] info:  Sync request received, sending ACK response...
+[18:39:22.260] info:  Done! Now waiting for client to consume the response...
+[18:39:22.260] info:  Handshake completed! Now waiting for incoming commands...
+[18:39:24.101] info:  Server side D3D9 DeviceEx created successfully!
+[18:39:24.682] info:  Server side D3D9 DeviceEx created successfully!
+[18:39:24.697] info:  Client window became active, reenabling timeouts for bridge server!
+[18:39:24.702] info:  Client window became inactive, disabling timeouts for bridge server...
+[18:39:46.464] info:  Client window became active, reenabling timeouts for bridge server!
+[18:39:48.850] info:  Client window became inactive, disabling timeouts for bridge server...
+[18:39:54.479] info:  Client window became active, reenabling timeouts for bridge server!
+[18:41:24.706] info:  Client window became inactive, disabling timeouts for bridge server...
+[18:41:26.318] info:  Client window became active, reenabling timeouts for bridge server!
+[18:48:51.045] info:  Client window became inactive, disabling timeouts for bridge server...
+[18:48:51.065] info:  The module command processing loop was exited unexpectedly, either due to timing out or some other command queue issue.
+[18:48:51.065] err:   8 objects discovered in Resource map at Direct3D module eviction:
+[18:48:51.065] err:   	4 -> 00000224AE0CDC60
+[18:48:51.065] err:   	5 -> 00000224AE0CDC60
+[18:48:51.065] err:   	6 -> 00000224C4AC5820
+[18:48:51.065] err:   	597 -> 00000226257D5650
+[18:48:51.065] err:   	599 -> 00000226257D50B0
+[18:48:51.065] err:   	77e -> 0000022625A94330
+[18:48:51.065] err:   	598 -> 00000226257D5650
+[18:48:51.065] err:   	77f -> 0000022625A93970
+[18:48:51.065] err:   3 objects discovered in Vertex Declaration map at Direct3D module eviction:
+[18:48:51.065] err:   	7 -> 00000224C37632D0
+[18:48:51.065] err:   	11 -> 00000224ACEFC720
+[18:48:51.065] err:   	12 -> 00000224ACEFC950
+[18:48:51.065] err:   2 objects discovered in Swapchain map at Direct3D module eviction:
+[18:48:51.065] err:   	3 -> 00000224C4746B00
+[18:48:51.065] err:   	596 -> 00000225264ABC70
+[18:48:51.065] err:   2 objects discovered in Device map at Direct3D module eviction:
+[18:48:51.065] err:   	2 -> 00000224C518D040
+[18:48:51.065] err:   	c -> 00000225374BD040
+[18:48:51.065] info:  Command processing loop finished, cleaning up and exiting...
+[18:48:51.065] info:  Shutdown cleanup successful, exiting now!
+[18:48:51.065] info:  [Uptime]: 569s
